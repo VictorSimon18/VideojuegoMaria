@@ -1,0 +1,32 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>export</title>
+<script type="module">
+  // Página auxiliar para tools/export-assets.mjs: genera sprites e iconos como PNG (dataURL).
+  import { generateCharSheet } from '../src/art/sprites.js';
+  import { makeCanvas, rect as R, drawPattern, outline, HEART_7 } from '../src/art/pixel.js';
+
+  function icon(size) {
+    const c = makeCanvas(size, size), g = c.getContext('2d');
+    // fondo con degradado cálido
+    const grad = g.createLinearGradient(0, 0, 0, size);
+    grad.addColorStop(0, '#3d2b63'); grad.addColorStop(0.6, '#c4577a'); grad.addColorStop(1, '#ffb374');
+    g.fillStyle = grad; g.fillRect(0, 0, size, size);
+    // corazón pixelado grande
+    const u = Math.floor(size / 12);
+    const h = makeCanvas(9, 8); drawPattern(h.getContext('2d'), HEART_7, { X: '#ff5d8f', L: '#ffc2d6' }, 1, 1); outline(h, '#2a1620');
+    g.imageSmoothingEnabled = false;
+    g.drawImage(h, Math.round((size - 9 * u) / 2), Math.round(size * 0.2), 9 * u, 8 * u);
+    // suelo
+    g.fillStyle = '#9bc45f'; g.fillRect(0, size * 0.82, size, u);
+    g.fillStyle = '#8a5a44'; g.fillRect(0, size * 0.82 + u, size, size);
+    return c.toDataURL('image/png');
+  }
+
+  window.__export = {
+    maria: () => generateCharSheet('maria').toDataURL('image/png'),
+    victor: () => generateCharSheet('victor').toDataURL('image/png'),
+    icon,
+  };
+  window.__ready = true;
+</script>

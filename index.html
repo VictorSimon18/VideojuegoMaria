@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <title>Nuestra historia - un juego para María</title>
+  <meta name="description" content="Un videojuego de plataformas hecho con cariño.">
+  <meta name="theme-color" content="#1d1026">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Para María">
+  <meta name="format-detection" content="telephone=no">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="assets/icons/icon-192.png">
+  <link rel="preload" href="assets/fonts/PressStart2P-Regular.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div id="app">
+    <canvas id="game" aria-label="Juego de plataformas"></canvas>
+
+    <!-- Controles táctiles (solo en dispositivos táctiles) -->
+    <div id="touch" class="hidden">
+      <div id="dpad" aria-label="Moverse">
+        <div class="arrow left"><span></span></div>
+        <div class="arrow right"><span></span></div>
+      </div>
+      <button id="btn-swap" class="hidden" aria-label="Cambiar de personaje">
+        <svg viewBox="0 0 24 24" width="60%" height="60%"><path d="M4 8h13l-3-3M20 16H7l3 3" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button id="btn-jump" aria-label="Saltar">
+        <svg viewBox="0 0 24 24" width="50%" height="50%"><path d="M12 19V6M6 11l6-6 6 6" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+
+    <button id="btn-mute" aria-label="Sonido">
+      <svg class="on" viewBox="0 0 24 24" width="62%" height="62%"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <svg class="off" viewBox="0 0 24 24" width="62%" height="62%"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 9l5 6M21 9l-5 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+    </button>
+
+    <!-- Aviso de orientación (solo táctil + vertical) -->
+    <div id="rotate">
+      <div class="phone"><span class="heart">&#9829;</span></div>
+      <p class="r1">Gira el móvil</p>
+      <p class="r2">Este juego se juega en horizontal</p>
+    </div>
+  </div>
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>
