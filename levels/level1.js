@@ -16,7 +16,7 @@ const chunks = [
     '', '', '', '', '', '', '',
     '.........o',
     '',
-    '.....c..........h...w...',
+    '..8..c..........h...w...',
   ], '########...#############'),
 
   // 3 - escalera de nubes con bichitos
@@ -57,7 +57,7 @@ const chunks = [
     '...T....XXXXXXX........l',
   ], '########################'),
 
-  // 7 - gran hueco para planear
+  // 7 - ZONA DE MARÍA: hueco enorme, solo se cruza planeando
   chunk([
     '', '', '', '', '', '',
     '.........o.o',
@@ -72,7 +72,20 @@ const chunks = [
     'T..e..h..e..o....e..T..w',
   ], '########################'),
 
-  // 9 - torre de nubes (corazón escondido)
+  // 9 - ZONA DE VÍCTOR: una caja en el techo cierra el paso. Hay que subir a la nube,
+  //     saltar y romperla desde abajo; María no puede, así que hay que cambiar de personaje.
+  chunk([
+    '', '', '',
+    '........o...o',
+    '......XXXXbbXXX',
+    '.............XX',
+    '.........===.XX',
+    '.............XX',
+    '......===....XX',
+    '...7.........XX...c',
+  ], '########################'),
+
+  // 10 - torre de nubes (corazón escondido)
   chunk([
     '....................o',
     '...................===',
@@ -86,7 +99,7 @@ const chunks = [
     '.....................c.5',
   ], '########################'),
 
-  // 10 - recta final con la puerta
+  // 11 - recta final con la puerta
   chunk([
     '', '', '', '', '', '', '', '', '',
     '..6.....l.....h...G...T.',

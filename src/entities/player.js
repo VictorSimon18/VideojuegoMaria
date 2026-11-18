@@ -12,7 +12,7 @@ export const CHARACTERS = {
   },
   victor: {
     id: 'victor', name: 'Víctor Simón',
-    jumpV: 330, airJumps: 1, airJumpV: 300, glide: false, breaks: true,
+    jumpV: 330, airJumps: 1, airJumpV: 320, glide: false, breaks: true,
     desc: 'Doble salto y rompe cajas',
   },
 };
@@ -39,6 +39,14 @@ export class Player {
   setCharacter(id, sheet) {
     this.def = CHARACTERS[id]; this.id = id;
     if (sheet) this.sheet = sheet;
+  }
+
+  /** Cambia de personaje en el mismo punto, conservando posición y velocidad. */
+  swapTo(id, sheet) {
+    this.setCharacter(id, sheet);
+    this.gliding = false; this.glideT = 0;
+    this.airJumps = this.onGround ? this.def.airJumps : 0;
+    this.sx = 1.3; this.sy = 0.8;
   }
 
   get cx() { return this.x + this.w / 2; }

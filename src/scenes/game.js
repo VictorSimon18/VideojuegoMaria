@@ -56,7 +56,23 @@ export class GameScene {
     this.sign = null; this.collected = 0; this.dyingT = 0; this.endT = 0;
     this.ready = true;
     audio.playMusic(this.theme.music);
-    this.app.setControls({ show: true, swap: false });
+    this.updateControls();
+  }
+
+  updateControls() {
+    const other = this.charId === 'maria' ? 'victor' : 'maria';
+    this.app.setControls({ show: true, swap: true, swapIcon: this.app.sheets[other] });
+  }
+
+  swap() {
+    const p = this.player;
+    if (p.dead || this.state !== 'play') return;
+    this.charId = this.charId === 'maria' ? 'victor' : 'maria';
+    p.swapTo(this.charId, this.app.sheets[this.charId]);
+    audio.sfx('swap');
+    this.particles.sparkle(p.cx, p.cy, 10, '#ffd98a'); this.particles.burstHearts(p.cx, p.y, 4, '#ff9ac4');
+    save.data.character = this.charId; save.commit();
+    this.updateControls();
   }
 
   get totalHearts() { return this.hearts.length; }
@@ -87,6 +103,7 @@ export class GameScene {
 
   updatePlay(dt) {
     const p = this.player, map = this.map;
+    if (input.consumeSwap()) this.swap();
     p.update(dt, input, map, {
       onJump: (k) => { audio.sfx(k === 'air' ? 'jump2' : 'jump'); this.particles.dust(p.cx, p.y + p.h, k === 'air' ? 5 : 3); if (k === 'air') this.particles.sparkle(p.cx, p.y + p.h, 5); },
       onLand: (v) => { if (v > 140) { audio.sfx('land'); this.particles.dust(p.cx, p.y + p.h, 4); } },
@@ -237,6 +254,7 @@ export class GameScene {
     const sf = view.safe, x0 = 6 + sf.l, y0 = 5 + sf.t;
     drawPattern(ctx, HEART_7, { X: '#ff5d8f', L: '#ffc2d6' }, x0, y0 + 1);
     drawText(ctx, `${this.collected}/${this.totalHearts}`, x0 + 11, y0, { size: 8 });
+    drawText(ctx, this.player.def.name, x0, y0 + 13, { size: 8, color: '#ffd98a' });
     if (this.banner > 0) {
       const a = Math.min(1, this.banner, (3.4 - this.banner) * 2);
       ctx.globalAlpha = a;

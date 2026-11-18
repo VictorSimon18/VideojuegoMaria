@@ -9,6 +9,7 @@ import { save } from './state/save.js';
 import { story } from '../levels/story.js';
 import { TitleScene } from './scenes/title.js';
 import { GameScene } from './scenes/game.js';
+import { SelectScene } from './scenes/select.js';
 
 const app = {
   story, save, audio,
@@ -25,7 +26,9 @@ const app = {
     this.scene = scene;
   },
 
-  afterTitle() { this.go(new GameScene(this, 1, save.data.character || 'maria')); },
+  afterTitle() { this.go(new SelectScene(this)); },
+
+  startLevel(n, charId) { save.data.character = charId; save.commit(); this.go(new GameScene(this, n, charId)); },
 
   levelFinished() { this.go(new TitleScene(this)); },
 };
@@ -35,8 +38,8 @@ async function boot() {
   initView(canvas);
   app.controls = initTouch();
   try { await document.fonts.load('8px "Press Start 2P"'); } catch (_) { /* usa la fuente de reserva */ }
-  const [maria] = await Promise.all([loadCharSheet('maria')]);
-  app.sheets.maria = maria;
+  const [maria, victor] = await Promise.all([loadCharSheet('maria'), loadCharSheet('victor')]);
+  app.sheets.maria = maria; app.sheets.victor = victor; app.hasVictor = true;
   await app.go(new TitleScene(app));
   document.body.classList.add('ready');
 

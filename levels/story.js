@@ -31,9 +31,11 @@ export const story = {
         1: 'Instituto Félix de Azara. Aquí empezó todo.',
         2: 'Primeras miradas, primeras risas... y mucho patio.',
         3: 'Nadie sabía todavía lo que iba a pasar.',
-        4: 'Mantén el salto en el aire para planear.',
+        4: 'Hueco enorme. Solo María puede cruzarlo: mantén el salto en el aire para planear.',
         5: 'Algunas cosas importantes empiezan sin avisar.',
         6: 'La puerta del final: sigue, que hay más historia.',
+        7: 'Cajas en lo alto. Víctor puede romperlas desde abajo: sube por las nubes y salta.',
+        8: 'Con el botón de cambio (Q o E en teclado) alternas entre María y Víctor.',
       },
       memory: {
         title: 'Recuerdo 1',

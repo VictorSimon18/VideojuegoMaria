@@ -89,6 +89,8 @@ html.touch #touch { display: block; }
   width: calc(22 * var(--u)); height: calc(22 * var(--u));
   background: rgba(255, 217, 138, 0.25); border-color: rgba(255, 233, 170, 0.8);
 }
+#swap-icon { height: 64%; width: auto; image-rendering: pixelated; margin-top: -4%; }
+#btn-swap .arrows { position: absolute; width: 38%; height: 38%; right: 2%; bottom: 4%; filter: drop-shadow(0 1px 1px rgba(0,0,0,.6)); }
 #btn-jump.down, #btn-swap.down { background: rgba(255, 111, 156, 0.7); transform: scale(0.96); }
 
 #btn-mute {

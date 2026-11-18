@@ -2,6 +2,7 @@
 // Cada control usa su propio puntero => multitouch real (moverse y saltar a la vez).
 import { input } from '../engine/input.js';
 import { audio } from '../audio/audio.js';
+import { CHAR_SHEET } from '../art/sprites.js';
 
 const $ = (s) => document.querySelector(s);
 
@@ -79,7 +80,11 @@ export function initTouch() {
 
   return {
     /** Muestra/oculta los controles táctiles según la escena. */
-    setControls({ show = true, swap = false } = {}) {
+    setControls({ show = true, swap = false, swapIcon = null } = {}) {
+      if (swapIcon) {
+        const c = $('#swap-icon'), g = c.getContext('2d'), { fw, fh } = CHAR_SHEET;
+        g.clearRect(0, 0, c.width, c.height); g.drawImage(swapIcon, 0, 0, fw, fh, 0, 0, fw, fh);
+      }
       $('#touch').classList.toggle('hidden', !show);
       $('#btn-swap').classList.toggle('hidden', !swap);
       if (!show) { setDir(0); input.touch.jump = false; input.sync(); }

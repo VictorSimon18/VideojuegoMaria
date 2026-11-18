@@ -100,7 +100,7 @@ function drawChar(g, who, pose) {
   } else {
     R(g, P.hair, 4, 4 + b, 1, 2); R(g, P.hair, 11, 4 + b, 1, 2);
     R(g, P.hair, 5, 5 + b, 5, 1);             // flequillo
-    R(g, P.hair, 5, 1 + b, 2, 1); R(g, P.hair, 9, 1 + b, 2, 1); // mechones
+    R(g, P.hair, 6, 1 + b, 3, 1); R(g, P.hair, 9, 2 + b, 3, 1); // remolino
     R(g, P.hairL, 7, 2 + b, 2, 1);
     R(g, P.stub, 5, 9 + b, 6, 1); R(g, P.stub, 5, 8 + b, 1, 1); R(g, P.stub, 10, 8 + b, 1, 1);
   }
