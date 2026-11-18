@@ -243,6 +243,67 @@ await page.evaluate(() => window.__maria.input.pressJump());
 await waitScene('FinalScene');
 for (const ph of [0, 1, 2]) { await page.waitForTimeout(1300); await shot(page, `4${ph}-final-${ph}`); await page.evaluate(() => window.__maria.input.pressJump()); }
 
+// ---------- Corazones al alcance (comprobación estática) y rendimiento ----------
+for (let n = 1; n <= 5; n++) {
+  await startLevel(n);
+  const r = await page.evaluate(() => {
+    const sc = window.__maria.app.scene, map = sc.map, bad = []; let pits = 0;
+    for (const h of sc.hearts) {
+      const tx = Math.floor(h.x / 16), ty = Math.floor(h.y / 16); let best = Infinity;
+      for (let cx = tx - 1; cx <= tx + 1; cx++) for (let y = ty; y <= map.H; y++) if (map.isSolid(cx, y) || map.isOneWay(cx, y)) { best = Math.min(best, y * 16 - h.y); break; }
+      if (best === Infinity) pits++; else if (best > 99) bad.push(`(${tx},${ty}) a ${best}px`);
+    }
+    return { bad, pits, total: sc.hearts.length };
+  });
+  check(r.bad.length === 0, `nivel ${n}: todos los corazones al alcance de un salto (${r.total - r.pits} sobre suelo, ${r.pits} sobre huecos para planear)${r.bad.length ? ' MAL: ' + r.bad.join(', ') : ''}`);
+}
+// Rendimiento: el bucle de juego (JS) cuesta <1 ms por fotograma; se mide en un viewport 1x porque
+// WebKit headless de Windows no tiene GPU y limita las pantallas de alta densidad por software.
+const browserF = await webkit.launch();   // instancia limpia: sin otras páginas compitiendo por la CPU
+const ctxF = await browserF.newContext({ viewport: { width: 844, height: 390 }, deviceScaleFactor: 1, hasTouch: true });
+const pF = await ctxF.newPage();
+await pF.goto(url);
+await pF.waitForFunction(() => window.__maria && window.__maria.app.scene && window.__maria.app.scene.ready);
+await pF.evaluate(() => window.__maria.app.startLevel(2, 'maria'));
+await pF.waitForFunction(() => { const s = window.__maria.app.scene; return s && s.constructor.name === 'GameScene' && s.ready; });
+await pF.waitForTimeout(700);
+const fps = await pF.evaluate(() => new Promise((res) => { let n = 0; const t0 = performance.now(); (function f() { n++; if (performance.now() - t0 < 2500) requestAnimationFrame(f); else res(n / 2.5); })(); }));
+const cost = await pF.evaluate(() => { const { app, view } = window.__maria, sc = app.scene; const t = performance.now(); for (let i = 0; i < 100; i++) { sc.update(1 / 120); sc.update(1 / 120); sc.draw(view.ctx); } return (performance.now() - t) / 100; });
+console.log(`INFO  coste de un fotograma de juego (2 pasos + dibujo): ${cost.toFixed(2)} ms; ${fps.toFixed(0)} fps medidos`);
+check(cost < 4 && fps > 50, `el juego es ligero y fluido (${cost.toFixed(2)} ms por fotograma, ${fps.toFixed(0)} fps)`);
+await ctxF.close(); await browserF.close();
+
+// ---------- Publicado en una subcarpeta (como GitHub Pages) ----------
+const sub = await startServer(0, '/VideojuegoMaria');
+const subUrl = `http://127.0.0.1:${sub.port}/VideojuegoMaria/`;
+const ctx3 = await browser.newContext({ ...devices['iPhone 14 landscape'] });
+const p3 = await ctx3.newPage();
+const bad404 = [];
+p3.on('response', (r) => { if (r.status() >= 400 && !/assets\/memories\//.test(r.url())) bad404.push(r.status() + ' ' + r.url()); });
+await p3.goto(subUrl);
+await p3.waitForFunction(() => window.__maria && window.__maria.app.scene && window.__maria.app.scene.ready, null, { timeout: 10000 });
+await p3.evaluate(() => window.__maria.app.startLevel(1, 'victor'));
+await p3.waitForFunction(() => { const s = window.__maria.app.scene; return s && s.constructor.name === 'GameScene' && s.ready; }, null, { timeout: 10000 });
+await p3.waitForTimeout(600);
+check(bad404.length === 0, `funciona publicado en una subcarpeta con rutas relativas${bad404.length ? ': ' + bad404.join(' | ') : ''}`);
+const manifest = await p3.evaluate(() => fetch('manifest.json').then((r) => r.json()));
+check(manifest.start_url === './' && manifest.orientation === 'landscape' && manifest.icons.length >= 2, 'manifest.json válido (start_url relativo, horizontal, iconos)');
+await ctx3.close(); sub.server.close();
+
+// ---------- Service worker: modo sin conexión ----------
+const ctx4 = await browser.newContext({ ...devices['iPhone 14 landscape'] });
+const p4 = await ctx4.newPage();
+await p4.goto(url + '?sw=1');
+await p4.evaluate(() => navigator.serviceWorker.ready);
+await p4.waitForTimeout(1500);
+const cached = await p4.evaluate(async () => { const ks = await caches.keys(); const c = await caches.open(ks[0]); return (await c.keys()).length; });
+check(cached >= 40, `el service worker guarda el juego para usarlo sin conexión (${cached} archivos)`);
+await ctx4.setOffline(true);
+await p4.reload();
+await p4.waitForFunction(() => window.__maria && window.__maria.app.scene && window.__maria.app.scene.ready, null, { timeout: 10000 }).catch(() => {});
+check(await p4.evaluate(() => !!(window.__maria && window.__maria.app.scene && window.__maria.app.scene.ready)), 'el juego arranca sin conexión');
+await ctx4.close();
+
 // ---------- Vertical: aviso de girar el móvil ----------
 const ctx2 = await browser.newContext({ ...devices['iPhone 14'] });
 const p2 = await ctx2.newPage();

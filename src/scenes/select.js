@@ -20,6 +20,7 @@ export class SelectScene {
     this.particles = new Particles();
     this.sel = save.data.character === 'victor' ? 1 : 0;
     this.app.setControls({ show: false });
+    audio.playMusic({ bpm: 84, root: 60, seed: 7, mode: 'major' }, 'menu');
   }
 
   card(i) {

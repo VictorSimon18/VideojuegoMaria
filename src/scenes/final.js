@@ -17,7 +17,7 @@ export class FinalScene {
     this.bg = makeBackground(THEMES.final);
     this.particles = new Particles();
     this.app.setControls({ show: false });
-    audio.playMusic({ bpm: 76, root: 60, seed: 99, mode: 'major' });
+    audio.playMusic({ bpm: 76, root: 60, seed: 99, mode: 'major' }, 'final');
   }
 
   next() {

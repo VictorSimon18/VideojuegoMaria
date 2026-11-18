@@ -24,10 +24,13 @@ const app = {
 
   setControls(c) { this.controls && this.controls.setControls(c); },
 
+  fade: 0,
+
   async go(scene) {
     this.scene = null;
     await scene.init();
     this.scene = scene;
+    this.fade = 1;   // fundido de entrada
   },
 
   afterTitle() { this.go(new SelectScene(this)); },
@@ -53,6 +56,7 @@ async function boot() {
   app.sheets.maria = maria; app.sheets.victor = victor; app.hasVictor = true;
   await app.go(new TitleScene(app));
   document.body.classList.add('ready');
+  const ld = document.getElementById('loading'); if (ld) ld.remove();
 
   document.getElementById('btn-pause').addEventListener('pointerdown', (e) => {
     e.preventDefault(); e.stopPropagation();
@@ -77,10 +81,24 @@ async function boot() {
         while (acc >= STEP && n++ < 16 && app.scene === sc) { sc.update(STEP); acc -= STEP; }
         if (n >= 16) acc = 0;
       }
-      if (app.scene === sc) sc.draw(view.ctx);
+      if (app.scene === sc) {
+        sc.draw(view.ctx);
+        if (app.fade > 0) {
+          view.ctx.globalAlpha = Math.min(1, app.fade); view.ctx.fillStyle = '#1d1026';
+          view.ctx.fillRect(0, 0, view.W, view.H); view.ctx.globalAlpha = 1;
+          if (!paused) app.fade -= dt * 3.2;
+        }
+      }
     }
   }
   requestAnimationFrame(frame);
+
+  // Modo sin conexión (PWA). No se registra en localhost para no confundir al desarrollar,
+  // salvo que la URL lleve ?sw=1 (lo usan las pruebas).
+  const local = ['localhost', '127.0.0.1'].includes(location.hostname);
+  if ('serviceWorker' in navigator && (!local || location.search.includes('sw=1'))) {
+    navigator.serviceWorker.register('sw.js').catch(() => { /* sin SW, el juego funciona igual */ });
+  }
 
   // Gancho de depuración/pruebas
   window.__maria = { app, input, view };

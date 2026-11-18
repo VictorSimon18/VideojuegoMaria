@@ -2,6 +2,8 @@
 // y márgenes de seguridad (notch / barra de inicio).
 import { VIEW_H, VIEW_MIN_W, VIEW_MAX_W } from './constants.js';
 
+const MAX_RENDER_SCALE = 4;
+
 export const view = {
   canvas: null,
   ctx: null,
@@ -42,19 +44,24 @@ export function layout() {
   const devW = cssW * dpr, devH = cssH * dpr;
   const raw = Math.min(devW / view.W, devH / view.H);
   // Escala entera cuando es pequeña (píxeles perfectos); libre cuando es grande.
-  view.scale = raw < 4 ? Math.max(1, Math.floor(raw)) : raw;
+  // Tamaño en pantalla (en píxeles de dispositivo): escala entera si es pequeña, libre si es grande.
+  const full = raw < 4 ? Math.max(1, Math.floor(raw)) : raw;
+  // Resolución interna limitada a 4 px por píxel lógico: el CSS la amplía sin suavizar (image-rendering: pixelated),
+  // se ve igual de nítido pero rellena muchos menos píxeles => 60 fps también en iPhone Pro.
+  view.scale = Math.min(full, MAX_RENDER_SCALE);
   const cw = Math.round(view.W * view.scale), ch = Math.round(view.H * view.scale);
+  const showW = view.W * full / dpr, showH = view.H * full / dpr;
   const c = view.canvas;
   c.width = cw; c.height = ch;
-  c.style.width = cw / dpr + 'px';
-  c.style.height = ch / dpr + 'px';
+  c.style.width = showW + 'px';
+  c.style.height = showH + 'px';
   view.ctx.setTransform(cw / view.W, 0, 0, ch / view.H, 0, 0);
   view.ctx.imageSmoothingEnabled = false;
 
   // Márgenes seguros convertidos a píxeles lógicos relativos al canvas centrado.
   const s = readSafeArea();
-  const k = view.W / (cw / dpr); // lógico por css px
-  const offX = (cssW - cw / dpr) / 2, offY = (cssH - ch / dpr) / 2;
+  const k = view.W / showW; // lógico por css px
+  const offX = (cssW - showW) / 2, offY = (cssH - showH) / 2;
   view.safe = {
     l: Math.max(0, (s.l - offX)) * k, r: Math.max(0, (s.r - offX)) * k,
     t: Math.max(0, (s.t - offY)) * k, b: Math.max(0, (s.b - offY)) * k,

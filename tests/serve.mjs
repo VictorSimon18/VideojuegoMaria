@@ -11,9 +11,11 @@ const MIME = {
   '.ttf': 'font/ttf', '.svg': 'image/svg+xml', '.txt': 'text/plain',
 };
 
-export function startServer(port = 0) {
+/** `prefix` simula una carpeta de GitHub Pages, p. ej. '/VideojuegoMaria' => http://host/VideojuegoMaria/ */
+export function startServer(port = 0, prefix = '') {
   const server = http.createServer((req, res) => {
     let p = decodeURIComponent(new URL(req.url, 'http://x').pathname);
+    if (prefix) { if (!p.startsWith(prefix + '/')) { res.writeHead(404); return res.end('fuera del prefijo'); } p = p.slice(prefix.length); }
     if (p.endsWith('/')) p += 'index.html';
     const file = path.join(ROOT, p);
     if (!file.startsWith(ROOT)) { res.writeHead(403); return res.end(); }

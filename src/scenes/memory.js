@@ -21,6 +21,7 @@ export class MemoryScene {
       const img = new Image(); img.onload = () => res(img); img.onerror = () => res(null);
       img.src = this.def.memory.photo;
     });
+    audio.playMusic({ bpm: 84, root: 60, seed: 7, mode: 'major' }, 'menu');
     audio.sfx('egg');
     this.particles.burstHearts(view.W * 0.3, 80, 14, '#ff9ac4');
   }

@@ -29,6 +29,7 @@ export class MapScene {
     this.bgTheme = this.sel;
     this.particles = new Particles();
     this.app.setControls({ show: false });
+    audio.playMusic({ bpm: 84, root: 60, seed: 7, mode: 'major' }, 'menu');
   }
 
   unlocked(i) { return i + 1 <= save.data.unlocked; }

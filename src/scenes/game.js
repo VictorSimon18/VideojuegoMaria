@@ -55,7 +55,7 @@ export class GameScene {
     this.iris = 0; this.irisTarget = 1; this.banner = 3.4; this.eggTaps = 0; this.eggT = 0; this.eggMsg = 0;
     this.sign = null; this.collected = 0; this.dyingT = 0; this.endT = 0;
     this.ready = true;
-    audio.playMusic(this.theme.music);
+    audio.playMusic(this.theme.music, 'level' + this.levelNum);
     this.updateControls();
   }
 

@@ -31,7 +31,7 @@ class AudioEngine {
       });
     }
     if (this.ctx.state !== 'running') this.ctx.resume();
-    if (this.pendingTrack) { const t = this.pendingTrack; this.pendingTrack = null; this.playMusic(t); }
+    if (this.pendingTrack) { const [t, k] = this.pendingTrack; this.pendingTrack = null; this.playMusic(t, k); }
   }
 
   setMuted(m) {
@@ -116,9 +116,12 @@ class AudioEngine {
     return { bpm: p.bpm, steps, total: 64 };
   }
 
-  playMusic(params) {
-    if (!this.ctx) { this.pendingTrack = params; return; }
+  /** `key` identifica la pieza: si ya suena, no se reinicia (continuidad entre pantallas). */
+  playMusic(params, key = null) {
+    if (!this.ctx) { this.pendingTrack = [params, key]; return; }
+    if (key && key === this.musicKey && this.timer) return;
     this.stopMusic();
+    this.musicKey = key;
     this.track = this.buildTrack(params);
     this.step = 0; this.nextTime = this.ctx.currentTime + 0.1;
     const tick = () => {
@@ -132,7 +135,7 @@ class AudioEngine {
     };
     this.timer = setInterval(tick, 100); tick();
   }
-  stopMusic() { if (this.timer) clearInterval(this.timer); this.timer = null; this.track = null; }
+  stopMusic() { if (this.timer) clearInterval(this.timer); this.timer = null; this.track = null; this.musicKey = null; this.pendingTrack = null; }
 
   _note(e, t0, dur) {
     const o = this.ctx.createOscillator(), g = this.ctx.createGain();

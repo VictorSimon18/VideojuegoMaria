@@ -14,6 +14,7 @@
   --plum: #1d1026;
   --u: 1vh;   /* unidad base de los controles: relativa al alto (juego horizontal) */
 }
+@supports (height: 1dvh) { :root { --u: 1dvh; } }   /* iOS: alto visible real */
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
@@ -59,7 +60,6 @@ html.touch #touch { display: block; }
   background: rgba(255, 243, 224, 0.16);
   border: 2px solid rgba(255, 243, 224, 0.4);
   display: flex; align-items: center; justify-content: center;
-  backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px);
   transition: background 0.05s;
 }
 .arrow span {
@@ -76,7 +76,6 @@ html.touch #touch { display: block; }
   color: var(--cream); font-family: inherit;
   background: rgba(255, 243, 224, 0.16);
   border: 2px solid rgba(255, 243, 224, 0.45);
-  backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px);
 }
 #btn-jump {
   right: calc(var(--safe-r) + 4 * var(--u)); bottom: calc(var(--safe-b) + 5 * var(--u));
@@ -126,6 +125,13 @@ html.touch.portrait #rotate { display: flex; }
 #rotate .heart { color: var(--pink); font-size: 22px; font-family: sans-serif; animation: beat 1.2s ease-in-out infinite; }
 @keyframes turn { 0%, 15% { transform: rotate(0); } 55%, 85% { transform: rotate(-90deg); } 100% { transform: rotate(0); } }
 @keyframes beat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.25); } }
+
+#loading {
+  position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 14px; color: var(--cream); background: var(--plum); z-index: 8; font-size: 10px;
+}
+#loading .heart { color: var(--pink); font-size: 30px; font-family: sans-serif; animation: beat 1.1s ease-in-out infinite; }
+#loading p { margin: 0; }
 
 /* Ocultar el canvas mientras no hay nada que mostrar */
 body:not(.ready) canvas { opacity: 0; }
