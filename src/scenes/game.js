@@ -21,7 +21,7 @@ import { save } from '../state/save.js';
 export class GameScene {
   constructor(app, levelNum = 1, charId = 'maria') {
     this.app = app; this.levelNum = levelNum; this.charId = charId;
-    this.ready = false;
+    this.ready = false; this.paused = false;
   }
 
   async init() {
@@ -80,6 +80,8 @@ export class GameScene {
   // ------------------------------------------------------------------ lógica
   update(dt) {
     if (!this.ready) return;
+    if (input.consumePause()) this.togglePause();
+    if (this.paused) return;
     this.time += dt;
     this.eggT = Math.max(0, this.eggT - dt); if (!this.eggT) this.eggTaps = 0;
     this.eggMsg = Math.max(0, this.eggMsg - dt);
@@ -187,7 +189,26 @@ export class GameScene {
 
   finish() { this.app.levelFinished(this); }
 
+  togglePause() {
+    if (this.state !== 'play' && !this.paused) return;
+    this.paused = !this.paused; input.clear(); audio.sfx('select');
+  }
+
+  pauseButtons() {
+    const W = view.W;
+    return [{ id: 'resume', y: 70, label: 'Continuar' }, { id: 'map', y: 96, label: 'Mapa de niveles' }]
+      .map((b) => ({ ...b, x: Math.round(W / 2 - 70), w: 140, h: 22 }));
+  }
+
   onPointer(x, y) {
+    if (this.paused) {
+      for (const b of this.pauseButtons()) {
+        if (x >= b.x && x <= b.x + b.w && y >= b.y && y <= b.y + b.h) {
+          if (b.id === 'resume') this.togglePause(); else { audio.stopMusic(); this.app.openMap(this.levelNum); }
+        }
+      }
+      return;
+    }
     if (this.state === 'complete' && this.endT > 1) { this.finish(); return; }
     // easter egg: tocar varias veces al personaje
     const p = this.player, px = p.cx - this.cam.x, py = p.cy - this.cam.y;
@@ -236,6 +257,17 @@ export class GameScene {
     this.drawHud(ctx);
     if (this.iris < 0.995) this.drawIris(ctx);
     if (this.state === 'complete') this.drawComplete(ctx);
+    if (this.paused) this.drawPause(ctx);
+  }
+
+  drawPause(ctx) {
+    const W = view.W, H = view.H;
+    ctx.fillStyle = 'rgba(29,16,38,0.75)'; ctx.fillRect(0, 0, W, H);
+    drawText(ctx, 'Pausa', W / 2, 40, { align: 'center', size: 12, color: '#ffd98a' });
+    for (const b of this.pauseButtons()) {
+      drawBox(ctx, b.x, b.y, b.w, b.h, { fill: '#3a2350', border: '#ff9ac4' });
+      drawText(ctx, b.label, b.x + b.w / 2, b.y + 7, { align: 'center', size: 8 });
+    }
   }
 
   drawSignBubble(ctx, cx, cy) {

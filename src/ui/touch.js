@@ -86,6 +86,7 @@ export function initTouch() {
         g.clearRect(0, 0, c.width, c.height); g.drawImage(swapIcon, 0, 0, fw, fh, 0, 0, fw, fh);
       }
       $('#touch').classList.toggle('hidden', !show);
+      $('#btn-pause').classList.toggle('hidden', !show);
       $('#btn-swap').classList.toggle('hidden', !swap);
       if (!show) { setDir(0); input.touch.jump = false; input.sync(); }
     },

@@ -51,7 +51,7 @@ export class SelectScene {
     this.prevL = input.left; this.prevR = input.right;
     if (this.leaving) {
       this.leaving -= dt;
-      if (this.leaving <= 0) { this.leaving = 0; this.app.startLevel(1, IDS[this.sel]); }
+      if (this.leaving <= 0) { this.leaving = 0; save.data.character = IDS[this.sel]; save.commit(); this.app.openMap(save.data.unlocked); }
     }
   }
 

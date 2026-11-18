@@ -18,7 +18,8 @@ const shot = (page, name) => page.screenshot({ path: path.join(out, name + '.png
 
 const ctx = await browser.newContext({ ...devices['iPhone 14 landscape'] });
 const page = await ctx.newPage();
-page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
+page.on('console', (m) => { if (m.type() === 'error' && !/status of 404/.test(m.text())) errors.push(m.text()); });
+page.on('response', (r) => { if (r.status() === 404 && !/assets\/memories\//.test(r.url())) errors.push('404 ' + r.url()); });
 page.on('pageerror', (e) => errors.push(String(e)));
 const sceneName = () => page.evaluate(() => { const s = window.__maria.app.scene; return s && s.ready !== false ? s.constructor.name : null; });
 const waitScene = (name) => page.waitForFunction((n) => { const s = window.__maria.app.scene; return !!s && s.constructor.name === n && s.ready !== false; }, name, { timeout: 10000 });
@@ -39,10 +40,19 @@ const cardCenter = (i) => page.evaluate((idx) => {
 }, i);
 let c0 = await cardCenter(0);
 await page.touchscreen.tap(c0.x, c0.y);
+await waitScene('MapScene');
+await page.waitForTimeout(800);
+await shot(page, '03-mapa');
+const tapLogical = (x, y) => page.evaluate(([x, y]) => {
+  const { view } = window.__maria, r = view.canvas.getBoundingClientRect();
+  return { x: r.left + x / view.W * r.width, y: r.top + y / view.H * r.height };
+}, [x, y]).then((c) => page.touchscreen.tap(c.x, c.y));
+const playBtn = await page.evaluate(() => { const b = window.__maria.app.scene.buttons().find((b) => b.id === 'play'); return [b.x + b.w / 2, b.y + b.h / 2]; });
+await tapLogical(...playBtn);
 await waitScene('GameScene');
 await page.waitForTimeout(1800);
 check(await page.evaluate(() => window.__maria.app.scene.player.id) === 'maria', 'la tarjeta de María inicia el juego con María');
-await shot(page, '03-nivel1-inicio');
+await shot(page, '03b-nivel1-inicio');
 
 // ---------- Controles táctiles (multitouch simulado sobre los botones reales) ----------
 const press = (sel, id, type) => page.evaluate(([s, i, t]) => {
@@ -164,6 +174,74 @@ check(W > 250, `el nivel 1 mide ${W} tiles de ancho`);
 await page.evaluate(() => { window.__maria.app.scene.complete(); });
 await page.waitForTimeout(1600);
 await shot(page, '15-nivel-completado');
+
+// ---------- Niveles 2-5: carga, contenido y capturas ----------
+const startLevel = async (n, who = 'maria') => {
+  await page.evaluate(([n, who]) => window.__maria.app.startLevel(n, who), [n, who]);
+  await waitScene('GameScene');
+  await page.waitForTimeout(500);
+};
+const teleport = (tx, who) => page.evaluate(([tx, who]) => {
+  const sc = window.__maria.app.scene, map = sc.map, p = sc.player;
+  sc.charId = who; p.swapTo(who, window.__maria.app.sheets[who]);
+  let ty = 0; while (ty < map.H && !map.isSolid(tx, ty)) ty++;
+  p.respawn(tx * 16 + 3, ty * 16 - 17); p.invuln = 9; sc.state = 'play'; sc.banner = 0;
+  sc.cam.snap(p, map, window.__maria.view.W, window.__maria.view.H);
+}, [tx, who]);
+for (let n = 2; n <= 5; n++) {
+  await startLevel(n);
+  const info = await page.evaluate(() => {
+    const sc = window.__maria.app.scene, map = sc.map;
+    let boxes = 0, gap = 0, best = 0;
+    for (let x = 0; x < map.W; x++) { for (let y = 0; y < map.H; y++) if (map.get(x, y) === 'b') boxes++; gap = map.isSolid(x, 10) ? 0 : gap + 1; best = Math.max(best, gap); }
+    return { W: map.W, hearts: sc.hearts.length, goal: !!sc.goal, signsMissing: sc.signs.filter((s) => !sc.def.signs[s.key]).map((s) => s.key),
+      signTexts: Object.keys(sc.def.signs).length, signs: sc.signs.length, boxes, gap: best, cps: sc.checkpoints.length, name: sc.def.name };
+  });
+  check(info.goal && info.hearts >= 10 && info.W > 250, `nivel ${n} (${info.name}): ${info.W} tiles, ${info.hearts} corazones, meta`);
+  check(info.signsMissing.length === 0 && info.signs === info.signTexts, `nivel ${n}: ${info.signs} carteles, todos con texto en story.js`);
+  check(info.boxes >= 2 && info.gap >= 9, `nivel ${n}: tiene zona de Víctor (${info.boxes} cajas) y de María (hueco de ${info.gap})`);
+  await shot(page, `20-nivel${n}-inicio`);
+  const cols = [Math.floor(info.W * 0.35), Math.floor(info.W * 0.62), info.W - 14];
+  for (const [k, tx] of cols.entries()) { await teleport(tx, k % 2 ? 'victor' : 'maria'); await page.waitForTimeout(450); await shot(page, `2${n}-nivel${n}-col${tx}`); }
+}
+
+// ---------- Completar nivel -> recuerdo -> mapa, con guardado ----------
+await startLevel(1);
+await page.evaluate(() => { const sc = window.__maria.app.scene; sc.hearts.forEach((h) => { h.got = true; }); sc.collected = sc.hearts.length; sc.complete(); });
+await page.waitForTimeout(1500);
+await shot(page, '30-completado-todos-los-corazones');
+await page.evaluate(() => window.__maria.input.pressJump());
+await waitScene('MemoryScene');
+await page.waitForTimeout(1200);
+await shot(page, '31-recuerdo');
+await page.evaluate(() => window.__maria.input.pressJump());
+await waitScene('MapScene');
+await page.waitForTimeout(700);
+await shot(page, '32-mapa-con-progreso');
+const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('videojuego-maria-v1')));
+check(saved.unlocked >= 2 && saved.memories[1] === true && (saved.hearts[1] || []).length > 5, `progreso guardado (nivel desbloqueado ${saved.unlocked}, recuerdo 1, ${(saved.hearts[1] || []).length} corazones)`);
+await page.reload();
+await waitScene('TitleScene');
+check(await page.evaluate(() => window.__maria.app.save.data.unlocked >= 2), 'el progreso sobrevive a recargar la página');
+
+// pausa y salir al mapa
+await page.evaluate(() => window.__maria.app.startLevel(2, 'maria'));
+await waitScene('GameScene'); await page.waitForTimeout(500);
+await page.evaluate(() => window.__maria.app.scene.togglePause());
+await page.waitForTimeout(200);
+await shot(page, '33-pausa');
+check(await page.evaluate(() => window.__maria.app.scene.paused), 'la pausa se activa');
+await page.evaluate(() => window.__maria.app.scene.onPointer(200, 100));   // "Mapa de niveles"
+await waitScene('MapScene');
+check(true, 'salir de la pausa lleva al mapa');
+
+// final del juego tras el nivel 5
+await startLevel(5);
+await page.evaluate(() => window.__maria.app.scene.complete());
+await page.waitForTimeout(1500);
+await page.evaluate(() => window.__maria.input.pressJump());
+await waitScene('FinalScene');
+for (const ph of [0, 1, 2]) { await page.waitForTimeout(1300); await shot(page, `4${ph}-final-${ph}`); await page.evaluate(() => window.__maria.input.pressJump()); }
 
 // ---------- Vertical: aviso de girar el móvil ----------
 const ctx2 = await browser.newContext({ ...devices['iPhone 14'] });

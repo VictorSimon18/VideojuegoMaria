@@ -10,12 +10,16 @@ import { story } from '../levels/story.js';
 import { TitleScene } from './scenes/title.js';
 import { GameScene } from './scenes/game.js';
 import { SelectScene } from './scenes/select.js';
+import { MapScene } from './scenes/map.js';
+import { MemoryScene } from './scenes/memory.js';
+import { FinalScene } from './scenes/final.js';
 
 const app = {
   story, save, audio,
   sheets: {},
   scene: null,
   hasVictor: false,
+  SelectScene, MemoryScene,   // referencias para escenas que navegan entre sí
   controls: null,
 
   setControls(c) { this.controls && this.controls.setControls(c); },
@@ -30,7 +34,14 @@ const app = {
 
   startLevel(n, charId) { save.data.character = charId; save.commit(); this.go(new GameScene(this, n, charId)); },
 
-  levelFinished() { this.go(new TitleScene(this)); },
+  openMap(sel) { this.go(new MapScene(this, sel)); },
+
+  /** Tras completar un nivel: recuerdo (si has recogido todos los corazones) y siguiente paso. */
+  levelFinished(scene) {
+    const n = scene.levelNum;
+    const after = n >= 5 ? () => this.go(new FinalScene(this)) : () => this.openMap(n + 1);
+    if (scene.allHearts) this.go(new MemoryScene(this, n, after)); else after();
+  },
 };
 
 async function boot() {
@@ -43,6 +54,10 @@ async function boot() {
   await app.go(new TitleScene(app));
   document.body.classList.add('ready');
 
+  document.getElementById('btn-pause').addEventListener('pointerdown', (e) => {
+    e.preventDefault(); e.stopPropagation();
+    if (app.scene && app.scene.togglePause) app.scene.togglePause();
+  });
   canvas.addEventListener('pointerdown', (e) => {
     if (!app.scene || !app.scene.onPointer) return;
     const p = toLogical(e); app.scene.onPointer(p.x, p.y, e);
