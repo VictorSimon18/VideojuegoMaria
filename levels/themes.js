@@ -22,10 +22,11 @@ export const THEMES = {
   // Nivel 2 - Zaragoza: Pilar, puente de Piedra y el Ebro (se completa en la fase 3)
   zaragoza: {
     ...base, bgKind: 'pilar',
+    floor: 'plaza', cloudSkin: 'jardinera', decor: 'plaza', floorLine: '#b5573d',   // adoquín de la plaza, jardineras y arbolitos
     sky: ['#2f3a7a', '#e0707f', '#ffc78a'], sun: '#fff0c0',
     far: '#8a5f8c', mid: '#6a4a7c', near: '#47345c', cloudBg: '#ffd5c5',
-    grass: '#a8c86a', grassD: '#78a050', dirt: '#9a6a4c', dirtD: '#774f3a',
-    brick: '#d98a5a', brickD: '#a8603e', box: '#d9a05c', boxD: '#8a5a30',
+    grass: '#efd2a8', grassD: '#c9a478', grassL: '#fbe8c8', dirt: '#d6b588', dirtD: '#b08f64', dirtL: '#ecd2a8',
+    brick: '#c9774f', brickD: '#a05a3a', brickL: '#e09a70', box: '#d9a05c', boxD: '#8a5a30',
     leaf: ['#ffb36a', '#ffd08a', '#d9784a'], petal: '#ffd6e0', bush: '#78a050', bushL: '#9cc468',
     enemy: 'paloma', flyerWing: '#dfe6f4', flyerWingD: '#aab6d0',
     gadgets: { mover: 'barca' },

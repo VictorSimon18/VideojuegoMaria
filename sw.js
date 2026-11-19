@@ -1,7 +1,7 @@
 // Service worker: permite jugar sin conexión y que la app se instale a pantalla completa.
 // Estrategia: se precachea todo el juego; después, "stale-while-revalidate" (se sirve lo guardado y se
 // actualiza en segundo plano). Si cambias archivos, SUBE el número de CACHE_VERSION para limpiar la caché.
-const CACHE_VERSION = 3;
+const CACHE_VERSION = 4;
 const CACHE = `videojuego-maria-v${CACHE_VERSION}`;
 
 const FILES = [
@@ -13,7 +13,7 @@ const FILES = [
   'src/engine/constants.js', 'src/engine/view.js', 'src/engine/input.js', 'src/engine/physics.js',
   'src/engine/tilemap.js', 'src/engine/camera.js',
   'src/art/pixel.js', 'src/art/sprites.js', 'src/art/tiles.js', 'src/art/backgrounds.js', 'src/art/particles.js',
-  'src/art/enemies.js', 'src/art/gadget_art.js', 'src/art/facade.js',
+  'src/art/enemies.js', 'src/art/gadget_art.js', 'src/art/facade.js', 'src/art/plaza.js',
   'src/audio/audio.js', 'src/state/save.js',
   'src/entities/player.js', 'src/entities/enemy.js', 'src/entities/gadgets.js',
   'src/ui/text.js', 'src/ui/touch.js',

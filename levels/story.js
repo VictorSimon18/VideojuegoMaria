@@ -48,15 +48,10 @@ export const story = {
     {
       id: 2, theme: 'zaragoza',
       name: 'Zaragoza',
-      subtitle: 'Basílica del Pilar, puente de Piedra y el Ebro',
+      subtitle: 'Basílica del Pilar y su plaza',
       signs: {
-        1: 'Zaragoza. Nuestra ciudad, nuestro punto de partida.',
-        2: 'El Ebro y el cierzo: sopla fuerte por aquí. ¡Súbete a las barcas!',
-        3: 'La Basílica del Pilar, al fondo, siempre vigilando. Y debajo, el puente de Piedra.',
-        4: 'Hueco enorme sobre el Ebro. María planea con el cierzo a favor: mantén el salto en el aire.',
-        5: 'Cajas en lo alto. Víctor las rompe desde abajo.',
-        6: 'El puente de Piedra guarda más secretos de los que parece.',
-        7: 'Zaragoza es mejor si la recorremos juntos.',
+        // Carteles vacíos a propósito: se rellenarán más adelante.
+        1: '', 2: '', 3: '', 4: '', 5: '', 6: '', 7: '',
       },
       memory: { title: 'Recuerdo 2', text: 'Paseos por Zaragoza. (Escribe aquí vuestro recuerdo.)', photo: 'assets/memories/nivel2.jpg' },
     },

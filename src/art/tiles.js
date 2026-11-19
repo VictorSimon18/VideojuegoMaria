@@ -26,8 +26,9 @@ function grassTop(g, th, r) {
 function courtTop(g, th, r, variant) {
   slab(g, th, r);
   R(g, th.grass, 0, 0, T, 4); R(g, th.grassL, 0, 0, T, 1); R(g, th.grassD, 0, 3, T, 2);
-  if (variant === 1) R(g, '#f4f4f4', 0, 1, T, 1);                                  // línea de pista
-  else if (variant === 2) for (let x = 1; x < T; x += 5) R(g, '#f4f4f4', x, 1, 3, 1);   // línea discontinua
+  const lc = th.floorLine || '#f4f4f4';
+  if (variant === 1) R(g, lc, 0, 1, T, 1);                                         // línea de pista / franja de ladrillo
+  else if (variant === 2) for (let x = 1; x < T; x += 5) R(g, lc, x, 1, 3, 1);        // línea discontinua
 }
 
 function slab(g, th, r) {
@@ -41,6 +42,13 @@ function slab(g, th, r) {
 function bench(g) {
   R(g, '#d9a064', 0, 0, T, 1); R(g, '#b87a44', 0, 1, T, 2); R(g, '#8a5a30', 0, 3, T, 1);
   R(g, '#3a3a44', 1, 4, 2, 2); R(g, '#3a3a44', 13, 4, 2, 2);
+}
+
+/** Jardinera de la plaza: piedra con flores (plataforma del nivel 2). */
+function planter(g) {
+  R(g, '#5f9448', 0, 0, T, 2); R(g, '#86b85a', 0, 0, T, 1);
+  for (let x = 1; x < T; x += 3) R(g, x % 2 ? '#ff7aa5' : '#ffd166', x, 0, 2, 1);
+  R(g, '#d9bd90', 0, 2, T, 4); R(g, '#b8986a', 0, 5, T, 1); R(g, '#f0dcb4', 0, 2, T, 1);
 }
 
 function brick(g, th) {
@@ -83,12 +91,12 @@ function thorn(g, th) {
 export function makeTileset(th) {
   const r = rng(1234);
   const mk = (fn) => { const c = makeCanvas(T, T); fn(c.getContext('2d')); return c; };
-  const patio = th.floor === 'patio';
+  const patio = th.floor === 'patio' || th.floor === 'plaza';
   const grass = [0, 1, 2].map((i) => mk((g) => (patio ? courtTop(g, th, r, i) : grassTop(g, th, r))));
   const dirt = [0, 1, 2].map(() => mk((g) => (patio ? slab(g, th, r) : dirtBase(g, th, r))));
   const sBrick = mk((g) => brick(g, th));
   const sBox = mk((g) => box(g, th));
-  const sCloud = mk((g) => (th.cloudSkin === 'banco' ? bench(g) : cloud(g, th)));
+  const sCloud = mk((g) => (th.cloudSkin === 'banco' ? bench(g) : th.cloudSkin === 'jardinera' ? planter(g) : cloud(g, th)));
   const sThorn = mk((g) => thorn(g, th));
   return {
     pick(map, tx, ty) {
@@ -135,8 +143,30 @@ function makePatioDecor(th) {
   };
 }
 
+/** Plaza del Pilar: arbolitos, jardineras con flores, palomas y farolas. */
+function makePlazaDecor(th) {
+  const r = rng(99);
+  const lamp = makeDecorPainter({ ...th, decor: null });
+  return function paint(g, ch, tx, ty) {
+    const cx = tx * T + 8, by = (ty + 1) * T;
+    if (ch === 'T') {
+      R(g, '#5a3c2c', cx - 1, by - 22, 3, 22); R(g, '#3a261c', cx + 1, by - 22, 1, 22);
+      pixelEllipse(g, '#3f6e3c', cx + 1, by - 30, 12, 10); pixelEllipse(g, '#5f9448', cx - 1, by - 34, 11, 9); pixelEllipse(g, '#86b85a', cx - 4, by - 37, 5, 3);
+      for (let i = 0; i < 6; i++) R(g, '#e0a040', cx - 10 + Math.floor(r() * 20), by - 42 + Math.floor(r() * 18), 2, 1);
+    } else if (ch === 'h') {   // jardinera larga con flores
+      R(g, '#d9bd90', cx - 14, by - 7, 28, 7); R(g, '#f0dcb4', cx - 14, by - 7, 28, 1); R(g, '#b8986a', cx - 14, by - 2, 28, 2);
+      R(g, '#4f8a3e', cx - 13, by - 10, 26, 3);
+      for (let i = -12; i < 13; i += 3) R(g, ['#ff7aa5', '#ffd166', '#ffffff', '#ff9bd0'][(i + 12) / 3 % 4], cx + i, by - 12 - (i % 2 ? 1 : 0), 2, 2);
+    } else if (ch === 'w') {   // paloma
+      pixelEllipse(g, '#aab4c8', cx, by - 4, 5, 3); R(g, '#8a94ac', cx - 4, by - 5, 4, 2); R(g, '#c8d0e0', cx + 3, by - 8, 3, 3);
+      R(g, '#e0a050', cx + 6, by - 7, 2, 1); R(g, '#e07a5a', cx - 1, by - 1, 1, 1); R(g, '#e07a5a', cx + 2, by - 1, 1, 1);
+    } else lamp(g, ch, tx, ty);
+  };
+}
+
 export function makeDecorPainter(th) {
   if (th.decor === 'patio') return makePatioDecor(th);
+  if (th.decor === 'plaza') return makePlazaDecor(th);
   const r = rng(99);
   return function paint(g, ch, tx, ty) {
     const cx = tx * T + 8, by = (ty + 1) * T;
