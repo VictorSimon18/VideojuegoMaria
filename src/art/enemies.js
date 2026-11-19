@@ -2,6 +2,7 @@
 //   math     -> signos matemáticos con ojos (x + ÷ π e Σ), nivel 1 (Instituto)
 //   paloma   -> palomas del Pilar, nivel 2 (Zaragoza)
 //   ardilla  -> ardillas del parque, nivel 3
+//   coche    -> coche rojo, nivel 3 (Parque Imperial)
 //   nota     -> notas musicales, nivel 4 (concierto)
 //   estrella -> estrellitas, nivel 5
 // Cada paseante son 2 fotogramas de 14x13. Se elige con theme.enemy en levels/themes.js.
@@ -57,6 +58,15 @@ const WALKERS = {
     R(g, '#c8803c', 8, 2, 1, 1); R(g, '#c8803c', 11, 2, 1, 1);                                // orejas
     R(g, '#2a1620', 10, 5, 1, 1); R(g, '#2a1620', 13, 6, 1, 1); R(g, '#ff9ac4', 9, 6, 1, 1);  // ojo, nariz, mejilla
     R(g, '#8a5a2c', f ? 5 : 4, 10, 2, 2); R(g, '#8a5a2c', f ? 8 : 9, 10, 2, 2);
+  })],
+  coche: () => [frame2((g, f) => {
+    const dy = f ? 0 : 1;   // el coche "bota" con el motor
+    R(g, '#c8302c', 0, 6 + dy, 14, 4); R(g, '#e0463e', 1, 6 + dy, 12, 1);                  // carrocería roja
+    R(g, '#c8302c', 3, 3 + dy, 8, 3); R(g, '#8ac0e0', 4, 4 + dy, 3, 2); R(g, '#8ac0e0', 8, 4 + dy, 3, 2);   // cabina y cristales
+    R(g, '#ff8a3a', 13, 7 + dy, 1, 2); R(g, '#fff4c4', 13, 6 + dy, 1, 1);                    // faro
+    R(g, '#2a1620', 0, 9 + dy, 14, 1); R(g, '#f4f4f4', 4, 8 + dy, 3, 1);                     // bajos y matrícula
+    R(g, '#2a1620', 2, 10, 3, 3); R(g, '#2a1620', 9, 10, 3, 3); R(g, '#b8b8c4', 3, 11, 1, 1); R(g, '#b8b8c4', 10, 11, 1, 1);   // ruedas
+    R(g, '#ffffff', 11, 7 + dy, 1, 1); R(g, '#2a1620', 11, 7 + dy, 1, 1);                    // ojo en el faro
   })],
   nota: () => [frame2((g, f) => {
     const dy = f ? -1 : 0;

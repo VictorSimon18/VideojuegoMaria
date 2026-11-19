@@ -1,6 +1,7 @@
 // Tileset y decoración generados por código a partir de un tema (paleta) del nivel.
 import { makeCanvas, rng, rect as R, pixelEllipse } from './pixel.js';
 import { pine, plane } from './facade.js';
+import { youngTree, armLamp } from './park.js';
 
 const T = 16;
 
@@ -143,6 +144,22 @@ function makePatioDecor(th) {
   };
 }
 
+/** Parque Imperial: arbolitos jóvenes, matojos secos, bolardos amarillos y farolas de brazo. */
+function makeParkDecor(th) {
+  const r = rng(99);
+  return function paint(g, ch, tx, ty) {
+    const cx = tx * T + 8, by = (ty + 1) * T;
+    if (ch === 'T') youngTree(g, cx, by, 44 + (tx % 4) * 4, r);
+    else if (ch === 'h') {   // matojo de hierba seca y verde
+      for (let i = -12; i < 13; i += 2) R(g, r() < 0.5 ? '#9a8a4a' : '#6f9a4a', cx + i, by - 4 - Math.floor(r() * 5), 1, 6 + Math.floor(r() * 3));
+      pixelEllipse(g, '#5f8a44', cx, by - 3, 11, 3);
+    } else if (ch === 'w') {   // bolardo amarillo plegable
+      R(g, '#e8b030', cx - 4, by - 8, 1, 8); R(g, '#e8b030', cx + 3, by - 8, 1, 8); R(g, '#e8b030', cx - 4, by - 9, 8, 1);
+      R(g, '#e8b030', cx - 3, by - 8, 1, 1); R(g, '#e8b030', cx + 2, by - 8, 1, 1); R(g, '#f8d868', cx - 4, by - 8, 1, 3); R(g, '#3a3440', cx - 5, by - 1, 10, 1);
+    } else if (ch === 'l') armLamp(g, cx, by, 50);
+  };
+}
+
 /** Plaza del Pilar: arbolitos, jardineras con flores, palomas y farolas. */
 function makePlazaDecor(th) {
   const r = rng(99);
@@ -167,6 +184,7 @@ function makePlazaDecor(th) {
 export function makeDecorPainter(th) {
   if (th.decor === 'patio') return makePatioDecor(th);
   if (th.decor === 'plaza') return makePlazaDecor(th);
+  if (th.decor === 'parque') return makeParkDecor(th);
   const r = rng(99);
   return function paint(g, ch, tx, ty) {
     const cx = tx * T + 8, by = (ty + 1) * T;

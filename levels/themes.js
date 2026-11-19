@@ -35,12 +35,13 @@ export const THEMES = {
   // Nivel 3 - Parque Imperial de Plaza: paseo de cita al anochecer
   parque: {
     ...base, bgKind: 'park',
+    floor: 'plaza', cloudSkin: 'banco', decor: 'parque', floorLine: '#7c7a84',   // camino de gravilla con bordillo, bancos y arbolitos
     sky: ['#241a4a', '#8a4a8a', '#ff9a8a'], sun: '#ffd0c0',
     far: '#6e4a86', mid: '#563c70', near: '#3e2a58', cloudBg: '#e9b4d0',
-    grass: '#86c06a', grassD: '#58924e', dirt: '#7a5848', dirtD: '#5e4338',
-    brick: '#b86a7a', brickD: '#8e4a5e', box: '#d9a05c', boxD: '#8a5a30',
+    grass: '#d9c39a', grassD: '#b59d74', grassL: '#ecdcb8', dirt: '#a98b68', dirtD: '#876c4e', dirtL: '#c4a884',
+    brick: '#8e8e9a', brickD: '#6a6a78', brickL: '#b0b0bc', box: '#d9a05c', boxD: '#8a5a30',
     leaf: ['#ff9ac4', '#ffc4de', '#d86a9e'], petal: '#ffe0ec', bush: '#58924e', bushL: '#7cb868',
-    enemy: 'ardilla',
+    enemy: 'coche',
     gadgets: { spring: 'seta', crumble: 'hoja' },
     music: { bpm: 88, root: 57, seed: 33, mode: 'minor' },
   },
