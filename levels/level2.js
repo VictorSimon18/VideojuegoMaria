@@ -1,11 +1,11 @@
-// Nivel 2 - Zaragoza. Se compone con trozos de levels/chunks.js (cambia el orden para rediseñarlo).
-// Carteles (de izquierda a derecha): 1 inicio, 2 nubes, 3 paseo, 4 hueco (María), 5 cajas (Víctor), 6 torre, 7 meta
+// Nivel 2 - Zaragoza. Se compone con trozos de levels/chunks.js (genéricos) y levels/chunks_themed.js (propios del nivel).
+// Cambia el orden de la lista para rediseñarlo. Carteles (de izquierda a derecha): 1 inicio, 2 Ebro, 3 Pilar, 4 hueco (María), 5 cajas (Víctor), 6 puente, 7 meta
 import { buildLevel } from './chunks.js';
+import { L2 } from './chunks_themed.js';
 
 export default {
   id: 2,
   rows: buildLevel([
-    'START', 'PITS', 'FLYERS', 'CLOUDS', 'CHECKWALK', 'BRIDGE', 'GLIDE', 'WALK2', 'MOUND',
-    'BOXGATE', 'THORNS', 'TOWER', 'FINALE',
+    'START', L2.RIVER, L2.ARCH, 'WALK2', L2.SKIPS, L2.HEAD, L2.GLIDEWIND, L2.RIVER2, 'WALK2', 'BOXGATE', 'TOWER', 'FINALE',
   ]),
 };

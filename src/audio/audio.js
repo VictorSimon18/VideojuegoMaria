@@ -78,6 +78,7 @@ class AudioEngine {
       case 'select': this.tone(784, 0.08, 'square', 0.08); break;
       case 'win': [523, 659, 784, 1047, 784, 1047, 1319].forEach((f, i) => this.tone(f, 0.2, 'square', 0.1, null, i * 0.1)); break;
       case 'egg': [1319, 1568, 2093, 1568, 2349].forEach((f, i) => this.tone(f, 0.15, 'triangle', 0.12, null, i * 0.07)); break;
+      case 'spring': this.tone(240, 0.22, 'square', 0.1, 1000); this.tone(480, 0.15, 'triangle', 0.08, 1400, 0.04); break;
       case 'sign': this.tone(880, 0.05, 'square', 0.05); break;
       default: break;
     }
@@ -116,12 +117,48 @@ class AudioEngine {
     return { bpm: p.bpm, steps, total: 64 };
   }
 
-  /** `key` identifica la pieza: si ya suena, no se reinicia (continuidad entre pantallas). */
+  /** Lee assets/music/playlist.json: { "menu": "assets/music/a.mp3", "level1": "...", ... } (opcional). */
+  async loadPlaylist() {
+    try {
+      const r = await fetch('assets/music/playlist.json', { cache: 'no-cache' });
+      if (r.ok) { const j = await r.json(); this.playlist = (j && typeof j === 'object') ? j : {}; }
+    } catch (_) { /* sin lista: se usa la música sintetizada */ }
+  }
+
+  /**
+   * Reproduce música de fondo. `key` identifica la pieza ('menu', 'level1'...'level5', 'final'): si ya suena,
+   * no se reinicia. Si en playlist.json hay un archivo para esa clave se usa; si no, o si falla, suena el chiptune.
+   */
   playMusic(params, key = null) {
     if (!this.ctx) { this.pendingTrack = [params, key]; return; }
-    if (key && key === this.musicKey && this.timer) return;
+    if (key && key === this.musicKey && (this.timer || this.fileEl)) return;
     this.stopMusic();
     this.musicKey = key;
+    const file = key && this.playlist && this.playlist[key];
+    if (file) { this._playFile(file, params, key); return; }
+    this._playChip(params);
+  }
+
+  _playFile(url, params, key) {
+    try {
+      const el = new Audio(url);
+      el.loop = true; el.preload = 'auto';
+      const src = this.ctx.createMediaElementSource(el);
+      src.connect(this.musicGain);
+      this.musicGain.gain.value = 0.9;
+      this.fileEl = el; this.fileSrc = src;
+      el.addEventListener('error', () => {   // archivo que no existe o formato no soportado: vuelve al chiptune
+        if (this.fileEl !== el) return;
+        this.stopMusic(); this.musicKey = key; this._playChip(params);
+      });
+      const p = el.play();
+      if (p && p.catch) p.catch(() => { if (this.fileEl === el) { this.stopMusic(); this.musicKey = key; this._playChip(params); } });
+    } catch (_) { this._playChip(params); }
+  }
+
+  _playChip(params) {
+    if (this.musicGain) this.musicGain.gain.value = 0.5;
+    this.trackGain = this.ctx.createGain(); this.trackGain.connect(this.musicGain);   // un nodo por pieza: permite fundirla al parar
     this.track = this.buildTrack(params);
     this.step = 0; this.nextTime = this.ctx.currentTime + 0.1;
     const tick = () => {
@@ -135,7 +172,22 @@ class AudioEngine {
     };
     this.timer = setInterval(tick, 100); tick();
   }
-  stopMusic() { if (this.timer) clearInterval(this.timer); this.timer = null; this.track = null; this.musicKey = null; this.pendingTrack = null; }
+
+  stopMusic() {
+    if (this.timer) clearInterval(this.timer);
+    this.timer = null; this.track = null; this.musicKey = null; this.pendingTrack = null;
+    if (this.trackGain) {   // fundido rápido: las notas ya programadas no siguen sonando
+      const tg = this.trackGain; this.trackGain = null;
+      try { tg.gain.cancelScheduledValues(0); tg.gain.setTargetAtTime(0, this.ctx.currentTime, 0.04); } catch (_) { /* ok */ }
+      setTimeout(() => { try { tg.disconnect(); } catch (_) { /* ok */ } }, 500);
+    }
+    if (this.fileEl) {
+      const el = this.fileEl; this.fileEl = null;
+      try { el.pause(); el.removeAttribute('src'); el.load(); } catch (_) { /* ok */ }
+      try { this.fileSrc && this.fileSrc.disconnect(); } catch (_) { /* ok */ }
+      this.fileSrc = null;
+    }
+  }
 
   _note(e, t0, dur) {
     const o = this.ctx.createOscillator(), g = this.ctx.createGain();
@@ -145,7 +197,7 @@ class AudioEngine {
     g.gain.setValueAtTime(0.0001, t0);
     g.gain.exponentialRampToValueAtTime(cfg[1], t0 + 0.02);
     g.gain.exponentialRampToValueAtTime(0.0001, t0 + len * 0.95);
-    o.connect(g); g.connect(this.musicGain);
+    o.connect(g); g.connect(this.trackGain || this.musicGain);
     o.start(t0); o.stop(t0 + len);
   }
 }

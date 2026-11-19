@@ -7,9 +7,12 @@ import { TileMap } from '../engine/tilemap.js';
 import { Camera } from '../engine/camera.js';
 import { Player } from '../entities/player.js';
 import { Blob, Flyer } from '../entities/enemy.js';
+import { buildGadgets, drawGadgets, SPRING_V } from '../entities/gadgets.js';
+import { makeGadgetSprites } from '../art/gadget_art.js';
 import { makeTileset, makeDecorPainter } from '../art/tiles.js';
 import { makeBackground } from '../art/backgrounds.js';
 import { makeItemSprites } from '../art/sprites.js';
+import { makeEnemySprites } from '../art/enemies.js';
 import { Particles } from '../art/particles.js';
 import { heartPath, HEART_7, drawPattern } from '../art/pixel.js';
 import { THEMES } from '../../levels/themes.js';
@@ -17,6 +20,8 @@ import { LEVELS } from '../../levels/index.js';
 import { drawText, drawBox, wrapText, drawLines } from '../ui/text.js';
 import { audio } from '../audio/audio.js';
 import { save } from '../state/save.js';
+
+const WIND = 45, LOWG = 0.45;   // viento (px/s) y gravedad reducida en las zonas
 
 export class GameScene {
   constructor(app, levelNum = 1, charId = 'maria') {
@@ -33,6 +38,9 @@ export class GameScene {
     this.map.build(makeTileset(this.theme), makeDecorPainter(this.theme));
     this.bg = makeBackground(this.theme);
     this.spr = makeItemSprites(this.theme);
+    this.enemySpr = makeEnemySprites(this.theme);
+    this.gadgetSpr = makeGadgetSprites(this.theme);
+    this.walkerCount = 0;
     this.cam = new Camera();
     this.particles = new Particles();
     this.time = 0; this.state = 'play';
@@ -42,10 +50,18 @@ export class GameScene {
       if (s.ch === 'S') start = s;
       else if (s.ch === 'o') this.hearts.push({ id: this.hearts.length, x: s.tx * TILE + 8, y: s.ty * TILE + 8, got: false });
       else if (s.ch === 'c') this.checkpoints.push({ tx: s.tx, ty: s.ty, on: false });
-      else if (s.ch === 'e') this.enemies.push(new Blob(s.tx, s.ty));
+      else if (s.ch === 'e') this.enemies.push(new Blob(s.tx, s.ty, this.walkerCount++));
       else if (s.ch === 'f') this.enemies.push(new Flyer(s.tx, s.ty));
       else if (s.ch === 'G') this.goal = { tx: s.tx, ty: s.ty };
-      else if (/[1-9]/.test(s.ch)) this.signs.push({ tx: s.tx, ty: s.ty, key: s.ch });
+      else if (/[0-9]/.test(s.ch)) this.signs.push({ tx: s.tx, ty: s.ty, key: s.ch });
+    }
+    const gad = buildGadgets(this.map.spawns);
+    this.platforms = gad.platforms; this.springs = gad.springs;
+    this.windTiles = []; this.lowgTiles = [];
+    for (let y = 0; y < this.map.H; y++) for (let x = 0; x < this.map.W; x++) {
+      const c = this.map.zone[y][x];
+      if (c === '>' || c === '<') this.windTiles.push({ tx: x, ty: y, dir: c === '>' ? 1 : -1 });
+      else if (c === 'z') this.lowgTiles.push({ tx: x, ty: y });
     }
     this.spawn = { x: start.tx * TILE + 3, y: (start.ty + 1) * TILE - 16 };
     this.player = new Player(this.charId, this.app.sheets[this.charId]);
@@ -106,7 +122,13 @@ export class GameScene {
   updatePlay(dt) {
     const p = this.player, map = this.map;
     if (input.consumeSwap()) this.swap();
+    for (const pf of this.platforms) pf.update(dt, this.time);
+    for (const s of this.springs) s.update(dt);
+    const zc = map.zoneAt(Math.floor(p.cx / TILE), Math.floor(p.cy / TILE));
+    p.ext = zc === '>' ? WIND : zc === '<' ? -WIND : 0;
+    p.gravScale = zc === 'z' ? LOWG : 1;
     p.update(dt, input, map, {
+      platforms: this.platforms,
       onJump: (k) => { audio.sfx(k === 'air' ? 'jump2' : 'jump'); this.particles.dust(p.cx, p.y + p.h, k === 'air' ? 5 : 3); if (k === 'air') this.particles.sparkle(p.cx, p.y + p.h, 5); },
       onLand: (v) => { if (v > 140) { audio.sfx('land'); this.particles.dust(p.cx, p.y + p.h, 4); } },
       onGlideStart: () => audio.sfx('glide'),
@@ -114,6 +136,14 @@ export class GameScene {
     });
     if (p.gliding && Math.random() < 0.4) this.particles.add({ kind: 'spark', x: p.cx + (Math.random() - 0.5) * 12, y: p.y + 6, vy: 10, life: 0.5, color: '#ffd0e0' });
 
+    // muelles: al caer o pisar uno, te lanzan hacia arriba
+    for (const s of this.springs) {
+      if (p.vy >= 0 && p.x + p.w > s.x && p.x < s.x + s.w && p.y + p.h >= s.y && p.y + p.h <= s.y + 12) {
+        p.vy = -SPRING_V; p.onGround = false; p.riding = null; p.airJumps = p.def.airJumps; p.glideT = 0; s.squash = 0.22;
+        p.sx = 0.75; p.sy = 1.3; audio.sfx('spring'); this.particles.sparkle(s.x + 7, s.y, 6, '#ffe9a0');
+      }
+    }
+    this.zoneFx();
     for (const e of this.enemies) e.update(dt, map);
 
     // corazones
@@ -162,6 +192,27 @@ export class GameScene {
         color: Math.random() < 0.3 ? '#ff9ac4' : this.theme.petal });
     }
     this.cam.follow(p, map, view.W, view.H, dt);
+  }
+
+  /** Rachas de viento y destellos de baja gravedad dentro de la pantalla. */
+  zoneFx() {
+    const cam = this.cam, W = view.W, H = view.H;
+    const pick = (list) => {
+      for (let k = 0; k < 6; k++) {
+        const z = list[(Math.random() * list.length) | 0];
+        const x = z.tx * TILE + Math.random() * TILE, y = z.ty * TILE + Math.random() * TILE;
+        if (x > cam.x && x < cam.x + W && y > cam.y && y < cam.y + H) return { x, y, z };
+      }
+      return null;
+    };
+    if (this.windTiles.length && Math.random() < 0.7) {
+      const q = pick(this.windTiles);
+      if (q) this.particles.add({ kind: 'streak', x: q.x, y: q.y, vx: q.z.dir * 130, life: 0.55, color: '#ffffffaa' });
+    }
+    if (this.lowgTiles.length && Math.random() < 0.25) {
+      const q = pick(this.lowgTiles);
+      if (q) this.particles.add({ kind: 'spark', x: q.x, y: q.y, vy: -6, life: 1.2, color: '#e0c8ff' });
+    }
   }
 
   hurt(fall = false) {
@@ -249,7 +300,8 @@ export class GameScene {
       ctx.drawImage(this.spr.heart, -4.5, -4);
       ctx.restore();
     }
-    for (const e of this.enemies) e.draw(ctx, this.spr[e.kind], cx, cy);
+    drawGadgets(ctx, this.gadgetSpr, this.platforms, this.springs, cx, cy, t);
+    for (const e of this.enemies) e.draw(ctx, e.kind === 'flyer' ? this.enemySpr.flyer : this.enemySpr.walkers[e.variant % this.enemySpr.walkers.length], cx, cy);
     this.player.draw(ctx, cx, cy);
     this.particles.draw(ctx, cx, cy);
 

@@ -24,8 +24,8 @@ export class SelectScene {
   }
 
   card(i) {
-    const w = 140, h = 118, cx = view.W * (i === 0 ? 0.27 : 0.73);
-    return { x: Math.round(cx - w / 2), y: 32, w, h };
+    const w = 140, h = 132, cx = view.W * (i === 0 ? 0.27 : 0.73);
+    return { x: Math.round(cx - w / 2), y: 24, w, h };
   }
 
   pick(i) {
@@ -61,21 +61,21 @@ export class SelectScene {
     this.bg.draw(ctx, 120 + t * 10, 0, W, H, t);
     ctx.fillStyle = 'rgba(29,16,38,0.55)'; ctx.fillRect(0, 0, W, H);
     this.particles.draw(ctx, 0, 0);
-    drawText(ctx, 'Elige a tu personaje', W / 2, 12, { align: 'center', size: 10, color: '#fff3e0' });
+    drawText(ctx, 'Elige a tu personaje', W / 2, 8, { align: 'center', size: 10, color: '#fff3e0' });
 
     IDS.forEach((id, i) => {
       const c = this.card(i), sel = this.sel === i, def = CHARACTERS[id];
       const lift = sel ? Math.round(Math.sin(t * 5) * 1.5) - 2 : 0;
       drawBox(ctx, c.x, c.y + lift, c.w, c.h, { fill: sel ? '#5a2f63' : '#33203f', border: sel ? '#ff6f9c' : '#7a5a8a' });
       const { fw, fh, anims } = CHAR_SHEET, a = anims.idle, f = Math.floor(t * a.fps) % a.n;
-      ctx.save(); ctx.translate(c.x + c.w / 2, c.y + 70 + lift); ctx.scale(3, 3);
+      ctx.save(); ctx.translate(c.x + c.w / 2, c.y + 84 + lift); ctx.scale(3, 3);
       if (!sel) ctx.globalAlpha = 0.75;
       ctx.drawImage(this.app.sheets[id], f * fw, a.row * fh, fw, fh, -fw / 2, -fh, fw, fh);
       ctx.restore();
-      drawText(ctx, def.name, c.x + c.w / 2, c.y + 76 + lift, { align: 'center', size: 8, color: sel ? '#ffd98a' : '#e8d8f0' });
-      drawLines(ctx, wrapText(ctx, def.desc, c.w - 14), c.x + c.w / 2, c.y + 90 + lift, { align: 'center', size: 8, color: '#fff3e0', gap: 3 });
+      drawText(ctx, def.name, c.x + c.w / 2, c.y + 90 + lift, { align: 'center', size: 8, color: sel ? '#ffd98a' : '#e8d8f0' });
+      drawLines(ctx, wrapText(ctx, def.desc, c.w - 14), c.x + c.w / 2, c.y + 104 + lift, { align: 'center', size: 8, color: '#fff3e0', gap: 3 });
     });
-    drawText(ctx, 'Podrás cambiar en pleno nivel', W / 2, 160, { align: 'center', size: 8, color: '#ffd98a' });
+    drawText(ctx, 'Podrás cambiar en pleno nivel', W / 2, 164, { align: 'center', size: 8, color: '#ffd98a' });
     if (this.leaving) { ctx.globalAlpha = 1 - this.leaving / 0.55; ctx.fillStyle = '#1d1026'; ctx.fillRect(0, 0, W, H); ctx.globalAlpha = 1; }
   }
 }

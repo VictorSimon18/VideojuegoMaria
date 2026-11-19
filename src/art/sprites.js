@@ -1,10 +1,10 @@
 // Sprites generados por código. Los personajes se pueden sustituir por PNG propios:
 // basta con dejar assets/sprites/maria.png y assets/sprites/victor.png con el formato de
-// hoja descrito en CHAR_SHEET (fotogramas de 16x20, 4 columnas x 5 filas).
+// hoja descrito en CHAR_SHEET (fotogramas de 20x26, 4 columnas x 5 filas).
 import { makeCanvas, rect as R, outline, drawPattern, heartSprite, pixelEllipse } from './pixel.js';
 
 export const CHAR_SHEET = {
-  fw: 16, fh: 20, cols: 4,
+  fw: 20, fh: 26, cols: 4,
   anims: {
     idle:  { row: 0, n: 2, fps: 2.5 },
     run:   { row: 1, n: 4, fps: 11 },
@@ -14,100 +14,129 @@ export const CHAR_SHEET = {
   },
 };
 
-// ---------- Paletas ----------
+// ---------- Paletas (tomadas de las fotos de referencia) ----------
 const PAL = {
   maria: {
-    skin: '#f4c7a3', hair: '#3a2218', hairL: '#5c3a2a', top: '#5a3426', topD: '#442619',
-    pants: '#4f78b0', pantsL: '#7197cc', shoe: '#3a2a30', gold: '#f6dc8a', eye: '#2a1a14', blush: '#ee9a8c', mouth: '#c9606a',
+    skin: '#f3c6a2', skinD: '#dca07f', hair: '#33201a', hairL: '#5c3a2c', top: '#4d2c20', topD: '#3a2017', topL: '#6a4030',
+    pants: '#4d77b0', pantsD: '#3b5f93', pantsL: '#7298cc', shoe: '#f0ece6', sole: '#b9b3a8', gold: '#f6dc8a',
+    eye: '#2a1812', blush: '#f0a090', mouth: '#c9606a', brow: '#2a1812',
   },
   victor: {
-    skin: '#e9bd98', hair: '#2a1b15', hairL: '#46302a', top: '#bcc0c8', topD: '#969ba5', zip: '#6b7078',
-    pants: '#2c2c36', pantsL: '#404050', shoe: '#17171c', gold: '#e2bb5c', eye: '#231712', stub: '#a47c64',
+    skin: '#e8bc98', skinD: '#cf9e7c', hair: '#2a1b15', hairL: '#4a342b', top: '#bcc0c8', topD: '#969ba5', topL: '#d6d9df', zip: '#6b7078',
+    pants: '#2b2b35', pantsD: '#1d1d26', pantsL: '#404050', shoe: '#18181d', sole: '#e8e8ee', gold: '#e2bb5c',
+    eye: '#1c110c', stub: '#8a6650', stubL: '#a98169', stubD: '#4a3328', brow: '#1c110c',
   },
 };
 
-// ---------- Poses (cuerpo en coordenadas de un fotograma 16x20) ----------
-// legs: [x, y, h]; arms: dy izquierda/derecha; up: brazos en alto; out: planeo (brazos abiertos)
+// ---------- Poses (en coordenadas del fotograma 20x26) ----------
+// legs: [x, y, h] (zapatilla en y+h..y+h+1); al/ar: desplazamiento de brazos; up: brazos en alto; out: planeo
 const POSES = {
   idle: [
-    { bob: 0, legs: [[4, 16, 3], [9, 16, 3]], al: 0, ar: 0 },
-    { bob: 1, legs: [[4, 16, 3], [9, 16, 3]], al: 1, ar: 1 },
+    { bob: 0, legs: [[5, 21, 2], [11, 21, 2]], al: 0, ar: 0 },
+    { bob: 1, legs: [[5, 21, 2], [11, 21, 2]], al: 1, ar: 1 },
   ],
   run: [
-    { bob: 0,  legs: [[3, 16, 3], [10, 16, 3]], al: -1, ar: 1 },
-    { bob: -1, legs: [[5, 17, 2], [8, 16, 3]], al: 0, ar: 0 },
-    { bob: 0,  legs: [[10, 16, 3], [3, 16, 3]], al: 1, ar: -1 },
-    { bob: -1, legs: [[8, 16, 3], [5, 17, 2]], al: 0, ar: 0 },
+    { bob: 0,  legs: [[3, 21, 2], [12, 21, 2]], al: -1, ar: 1 },
+    { bob: -1, legs: [[6, 21, 1], [10, 21, 2]], al: 0, ar: 0 },
+    { bob: 0,  legs: [[12, 21, 2], [3, 21, 2]], al: 1, ar: -1 },
+    { bob: -1, legs: [[10, 21, 2], [6, 21, 1]], al: 0, ar: 0 },
   ],
-  jump: [{ bob: 0, legs: [[4, 16, 2], [9, 15, 2]], up: true }],
-  fall: [{ bob: 0, legs: [[4, 16, 3], [9, 16, 3]], up: 'half' }],
-  glide: [{ bob: 0, legs: [[5, 16, 3], [8, 16, 3]], out: true }],
+  jump: [{ bob: 0, legs: [[5, 21, 1], [11, 20, 1]], up: true }],
+  fall: [{ bob: 0, legs: [[5, 21, 2], [11, 21, 2]], up: 'half' }],
+  glide: [{ bob: 0, legs: [[6, 21, 2], [10, 21, 2]], out: true }],
 };
 
-/** Dibuja un fotograma de personaje mirando a la derecha. */
+/** Dibuja un fotograma de personaje mirando a la derecha (vista casi frontal). */
 function drawChar(g, who, pose) {
   const P = PAL[who], maria = who === 'maria';
   const b = pose.bob || 0;
-  // pelo largo por detrás (María)
-  if (maria) R(g, P.hair, 3, 3 + b, 10, pose.out ? 7 : 11);
-  // piernas
+
+  // --- pelo largo por detrás (María) ---
+  if (maria) R(g, P.hair, 3, 5 + b, 14, pose.out ? 11 : 14);
+
+  // --- piernas y zapatillas ---
   for (const [x, y, h] of pose.legs) {
-    R(g, P.pants, x, y, 3, h);
-    R(g, P.shoe, x, y + h - 1, 3, 1);
-    if (maria) R(g, P.pantsL, x + 1, y, 1, Math.max(1, h - 1));
+    R(g, P.pants, x, y, 4, h);
+    R(g, P.pantsL, x + 1, y, 1, h);
+    if (!maria) { R(g, P.pantsD, x, y, 1, h); R(g, P.pantsL, x + 3, y, 1, 1); }   // bolsillo cargo
+    R(g, P.shoe, x, y + h, 4, 1);
+    R(g, P.sole, x, y + h + 1, 4, 1);
+    if (maria) R(g, '#ffffff', x + 1, y + h, 1, 1);
   }
-  // torso
+
+  // --- torso ---
   if (maria) {
-    R(g, P.top, 4, 10 + b, 8, 4);
-    R(g, P.topD, 4, 13 + b, 8, 1);
-    R(g, P.skin, 4, 10 + b, 3, 1);            // hombro descubierto
-    R(g, P.skin, 5, 14 + b, 6, 1);            // ombligo/cintura
-    R(g, P.pants, 4, 15, 8, 1);
-    R(g, P.gold, 8, 15, 1, 1);                // botón
+    R(g, P.top, 5, 15 + b, 10, 5);                    // top marrón de manga larga
+    R(g, P.topL, 9, 16 + b, 4, 1); R(g, P.topD, 5, 19 + b, 10, 1);
+    R(g, P.skin, 5, 15 + b, 4, 2);                    // hombro descubierto (cuello caído)
+    R(g, P.skin, 7, 15 + b, 6, 1);                    // clavícula
+    R(g, P.skinD, 6, 17 + b, 2, 1);
+    R(g, P.skin, 6, 20 + b, 8, 1);                    // cintura
+    R(g, P.pants, 5, 21, 10, 1);                      // vaqueros
+    R(g, P.pantsL, 7, 21, 1, 1); R(g, P.pantsL, 12, 21, 1, 1);
+    R(g, P.gold, 10, 21, 1, 1);                       // botón
   } else {
-    R(g, P.top, 3, 10 + b, 10, 6);
-    R(g, P.topD, 3, 15 + b, 10, 1);
-    R(g, P.topD, 5, 10 + b, 6, 1);            // capucha
-    R(g, P.zip, 8, 12 + b, 1, 4);             // cremallera
-    R(g, P.gold, 7, 11 + b, 3, 1);            // cadena
-    R(g, P.gold, 8, 12 + b, 1, 1);
+    R(g, P.top, 3, 14 + b, 14, 7);                    // sudadera oversize
+    R(g, P.topL, 4, 16 + b, 3, 2); R(g, P.topD, 15, 15 + b, 2, 5);
+    R(g, P.topD, 5, 14 + b, 10, 2);                   // capucha alrededor del cuello
+    R(g, P.zip, 9, 16 + b, 1, 5); R(g, P.gold, 9, 17 + b, 1, 1);   // cremallera con tirador
+    R(g, '#f2f2f2', 7, 16 + b, 1, 4); R(g, '#f2f2f2', 12, 16 + b, 1, 4);   // cordones
+    R(g, '#d0d0d8', 7, 19 + b, 1, 1); R(g, '#d0d0d8', 12, 19 + b, 1, 1);
+    R(g, P.gold, 8, 15 + b, 1, 1); R(g, P.gold, 10, 15 + b, 1, 1); R(g, P.gold, 9, 16 + b, 1, 1);   // cadena
+    R(g, P.topD, 6, 19 + b, 8, 1); R(g, P.topD, 6, 19 + b, 1, 2); R(g, P.topD, 13, 19 + b, 1, 2);   // bolsillo canguro
+    R(g, P.topD, 3, 20 + b, 14, 1);                   // puño inferior
   }
-  // brazos
-  const ax = maria ? [2, 12] : [1, 13];
+
+  // --- brazos ---
   const sleeve = P.top;
-  if (pose.out) {
-    R(g, sleeve, 1, 10 + b, 4, 2); R(g, P.skin, 1, 10 + b, 1, 2);
-    R(g, sleeve, 11, 10 + b, 4, 2); R(g, P.skin, 14, 10 + b, 1, 2);
+  if (pose.out) {                                      // planeo: brazos abiertos
+    if (maria) { R(g, sleeve, 0, 15 + b, 6, 3); R(g, P.skin, 0, 15 + b, 1, 3); R(g, sleeve, 14, 15 + b, 6, 3); R(g, P.skin, 19, 15 + b, 1, 3); }
+    else { R(g, sleeve, 0, 14 + b, 5, 3); R(g, P.skin, 0, 14 + b, 1, 3); R(g, sleeve, 15, 14 + b, 5, 3); R(g, P.skin, 19, 14 + b, 1, 3); }
   } else {
-    const up = pose.up === true ? -3 : (pose.up === 'half' ? -1 : 0);
-    const dl = (pose.al || 0), dr = (pose.ar || 0);
+    const up = pose.up === true ? -5 : (pose.up === 'half' ? -2 : 0);
+    const dl = pose.al || 0, dr = pose.ar || 0;
+    const ax = maria ? [2, 15] : [1, 16], top = maria ? 16 : 15, len = maria ? 4 : 5;
     for (const [i, d] of [[0, dl], [1, dr]]) {
-      const x = ax[i], y = 11 + b + d + up;
-      R(g, sleeve, x, y, 2, 4);
-      R(g, P.skin, x, y + 4 * (up < 0 ? 0 : 1) - (up < 0 ? 1 : 0), 2, 1);
+      const x = ax[i], y = top + b + d + up;
+      R(g, sleeve, x, y, 3, len);
+      if (!maria) R(g, P.topD, x, y + len - 1, 3, 1);
+      R(g, P.skin, x, up < 0 ? y - 2 : y + len, 3, 2);   // mano
     }
   }
-  // cabeza
-  R(g, P.skin, 5, 5 + b, 6, 5);
-  R(g, P.hair, 4, 2 + b, 8, 3);
+
+  // --- cabeza ---
+  R(g, P.skin, 5, 6 + b, 10, 7); R(g, P.skin, 6, 13 + b, 8, 1); R(g, P.skin, 8, 14 + b, 4, 1);
   if (maria) {
-    R(g, P.hair, 4, 4 + b, 1, 6); R(g, P.hair, 11, 4 + b, 1, 6);
-    R(g, P.hair, 5, 5 + b, 2, 1); R(g, P.hair, 9, 5 + b, 2, 1);
-    R(g, P.hairL, 6, 2 + b, 2, 1);
-    R(g, P.gold, 4, 9 + b, 1, 1);             // pendiente
-    R(g, P.blush, 5, 8 + b, 1, 1); R(g, P.blush, 10, 8 + b, 1, 1);
-    R(g, P.mouth, 7, 9 + b, 2, 1);
+    R(g, P.hair, 5, 2 + b, 10, 1); R(g, P.hair, 4, 3 + b, 12, 4);                          // flequillo/cabeza
+    R(g, P.hair, 4, 6 + b, 2, 8); R(g, P.hair, 14, 6 + b, 2, 8);                           // mechones laterales
+    R(g, P.skin, 8, 5 + b, 4, 2);                                                          // raya al medio
+    R(g, P.hair, 6, 6 + b, 2, 1); R(g, P.hair, 12, 6 + b, 2, 1);
+    R(g, P.hairL, 6, 3 + b, 3, 1); R(g, P.hairL, 12, 4 + b, 2, 1); R(g, P.hairL, 4, 9 + b, 1, 3);
+    R(g, P.brow, 7, 7 + b, 3, 1); R(g, P.brow, 11, 7 + b, 3, 1);                           // cejas (con un píxel de aire sobre los ojos)
+    R(g, P.eye, 8, 9 + b, 2, 2); R(g, P.eye, 12, 9 + b, 2, 2);                             // ojos grandes
+    R(g, '#ffffff', 8, 9 + b, 1, 1); R(g, '#ffffff', 12, 9 + b, 1, 1);
+    R(g, P.blush, 7, 11 + b, 1, 1); R(g, P.blush, 13, 11 + b, 1, 1);
+    R(g, P.mouth, 10, 12 + b, 2, 1);                                                       // sonrisa pequeña
+    R(g, P.gold, 4, 13 + b, 1, 2); R(g, P.gold, 15, 13 + b, 1, 2);                         // aros
   } else {
-    R(g, P.hair, 4, 4 + b, 1, 2); R(g, P.hair, 11, 4 + b, 1, 2);
-    R(g, P.hair, 5, 5 + b, 5, 1);             // flequillo
-    R(g, P.hair, 6, 1 + b, 3, 1); R(g, P.hair, 9, 2 + b, 3, 1); // remolino
-    R(g, P.hairL, 7, 2 + b, 2, 1);
-    R(g, P.stub, 5, 9 + b, 6, 1); R(g, P.stub, 5, 8 + b, 1, 1); R(g, P.stub, 10, 8 + b, 1, 1);
+    R(g, P.hair, 5, 2 + b, 10, 1); R(g, P.hair, 4, 3 + b, 12, 4);
+    R(g, P.hair, 6, 1 + b, 3, 1); R(g, P.hair, 11, 1 + b, 2, 1); R(g, P.hair, 14, 2 + b, 2, 1);   // remolinos
+    R(g, P.hair, 4, 6 + b, 1, 5); R(g, P.hair, 15, 6 + b, 1, 5);                           // patillas
+    R(g, P.hair, 5, 6 + b, 4, 1); R(g, P.hair, 10, 6 + b, 5, 1);   // flequillo
+    R(g, P.hairL, 7, 3 + b, 3, 1); R(g, P.hairL, 12, 4 + b, 2, 1);
+    R(g, P.brow, 6, 7 + b, 3, 1); R(g, P.brow, 11, 7 + b, 3, 1);
+    R(g, P.eye, 7, 9 + b, 2, 2); R(g, P.eye, 12, 9 + b, 2, 2);
+    R(g, '#ffffff', 7, 9 + b, 1, 1); R(g, '#ffffff', 12, 9 + b, 1, 1);
+    R(g, P.skinD, 10, 10 + b, 1, 2);                                                       // nariz
+    R(g, P.stub, 5, 11 + b, 10, 3);                                                        // barba corta
+    R(g, P.stubL, 6, 12 + b, 1, 1); R(g, P.stubL, 9, 13 + b, 1, 1); R(g, P.stubL, 12, 12 + b, 1, 1); R(g, P.stubL, 13, 13 + b, 1, 1);
+    R(g, P.stubD, 8, 11 + b, 5, 1);                                                        // bigote
+    R(g, P.skin, 5, 10 + b, 1, 1); R(g, P.skin, 14, 10 + b, 1, 1);
+    R(g, '#a85a5a', 10, 12 + b, 2, 1);                                                     // boca
   }
-  R(g, P.eye, 6, 7 + b, 1, 1); R(g, P.eye, 9, 7 + b, 1, 1);
 }
 
-/** Hoja completa generada por código (64x100). */
+/** Hoja completa generada por código (80x130). */
 export function generateCharSheet(who) {
   const { fw, fh, cols, anims } = CHAR_SHEET;
   const c = makeCanvas(fw * cols, fh * 5);

@@ -34,6 +34,7 @@ export class Player {
     this.anim = 'idle'; this.animT = 0; this.invuln = 0; this.dead = false;
     this.sx = 1; this.sy = 1;   // squash & stretch
     this.hidden = false;
+    this.ext = 0; this.gravScale = 1; this.riding = null;   // viento, baja gravedad, plataforma sobre la que va
   }
 
   setCharacter(id, sheet) {
@@ -54,7 +55,7 @@ export class Player {
 
   respawn(x, y) {
     this.x = x; this.y = y; this.vx = 0; this.vy = 0; this.dead = false;
-    this.invuln = 1.2; this.gliding = false; this.glideT = 0; this.sx = this.sy = 1;
+    this.invuln = 1.2; this.gliding = false; this.glideT = 0; this.sx = this.sy = 1; this.riding = null; this.ext = 0;
   }
 
   /** @param {object} fx callbacks: { onJump(kind), onLand(), onBreak(tx,ty), onGlideStart() } */
@@ -64,6 +65,9 @@ export class Player {
     this.coyote = this.onGround ? COYOTE : Math.max(0, this.coyote - dt);
     if (this.onGround) { this.airJumps = this.def.airJumps; this.glideT = 0; }
     this.invuln = Math.max(0, this.invuln - dt);
+    if (this.riding) {   // la plataforma móvil arrastra al jugador
+      if (this.riding.active) { this.x += this.riding.dx; this.y += this.riding.dy; } else this.riding = null;
+    }
 
     // ---- Horizontal ----
     const dir = (input.right ? 1 : 0) - (input.left ? 1 : 0);
@@ -98,7 +102,7 @@ export class Player {
       this.vy += (GLIDE_FALL - this.vy) * Math.min(1, 12 * dt);
       if (!wasGliding && fx.onGlideStart) fx.onGlideStart();
     } else {
-      let g = GRAVITY;
+      let g = GRAVITY * (this.gravScale || 1);
       if (this.vy > 0) g *= FALL_MULT;
       else if (!input.jump) g *= CUT_MULT;
       this.vy = Math.min(MAX_FALL, this.vy + g * dt);
@@ -107,7 +111,20 @@ export class Player {
     // ---- Movimiento y colisión ----
     this.wasGround = this.onGround;
     const vyBefore = this.vy;
+    const prevBottom = this.y + this.h;
     moveBody(this, map, dt);
+    // aterrizaje sobre plataformas (móviles, hojas, bloques al ritmo): se pisan desde arriba
+    if (!this.onGround && this.vy >= 0 && fx.platforms) {
+      for (const pf of fx.platforms) {
+        if (!pf.active) continue;
+        const bottom = this.y + this.h;
+        if (this.x + this.w > pf.x + 1 && this.x < pf.x + pf.w - 1 && prevBottom <= pf.y + 2 && bottom >= pf.y - 0.001 && bottom <= pf.y + 10) {
+          this.y = pf.y - this.h; this.vy = 0; this.onGround = true; this.riding = pf; pf.touch();
+          break;
+        }
+      }
+    }
+    if (!this.onGround) this.riding = null;
     if (this.onGround && !this.wasGround) {
       this.sx = 1.25; this.sy = 0.78; fx.onLand && fx.onLand(vyBefore);
     }

@@ -3,7 +3,8 @@ import { moveBody } from '../engine/physics.js';
 
 /** Bichito que pasea por el suelo y da la vuelta en paredes y bordes. */
 export class Blob {
-  constructor(tx, ty) {
+  constructor(tx, ty, variant = 0) {
+    this.variant = variant;   // qué signo / aspecto de la lista del tema
     this.w = 12; this.h = 10;
     this.x = tx * 16 + 2; this.y = (ty + 1) * 16 - this.h;
     this.vx = -22; this.vy = 0; this.t = Math.random() * 3; this.alive = true;

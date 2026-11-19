@@ -7,6 +7,15 @@ Un videojuego de plataformas 2D en pixel art, hecho con cariño. Se juega en el 
   - **María Bailera**: salta más alto y **planea** si mantienes el salto en el aire.
   - **Víctor Simón**: **doble salto** y **rompe cajas** golpeándolas por debajo.
 - Cada nivel tiene una zona que solo puede pasar María (un hueco enorme) y otra que solo puede pasar Víctor (cajas en el techo).
+- **Cada nivel tiene sus propios obstáculos y enemigos:**
+
+| Nivel | Obstáculos propios | Enemigos |
+|---|---|---|
+| 1 Instituto Félix de Azara | rosas con espinas, nubes, montículos de ladrillos | signos matemáticos (× + ÷ π e Σ) |
+| 2 Zaragoza | cierzo (viento a favor y en contra), barcas sobre el Ebro, arcos del puente de Piedra | palomas |
+| 3 Parque Imperial de Plaza | setas que lanzan por los aires, hojas que caen al pisarlas, rosas anchas | ardillas |
+| 4 Madrid, WiZink Centre | bloques rosas y azules que se alternan al ritmo, ascensores, altavoces-muelle | notas musicales |
+| 5 Sorpresa final | baja gravedad, estrellas que caen, estrellas móviles, muelles de estrella | estrellitas |
 - Sin game over: si te toca un bichito o una espina de rosa, reapareces en el último checkpoint.
 - Se guarda el progreso (nivel desbloqueado, corazones, recuerdos) en el propio navegador.
 
@@ -44,7 +53,7 @@ Se recortan al centro en un cuadrado, así que sirve cualquier proporción. Conv
 
 ### Sprites de los personajes
 
-Los sprites se generan por código, pero hay PNG listos para sustituir en **`assets/sprites/maria.png`** y **`assets/sprites/victor.png`**. Cada hoja mide 64×100 px: fotogramas de 16×20 px en 4 columnas y 5 filas:
+Los sprites se generan por código, pero hay PNG listos para sustituir en **`assets/sprites/maria.png`** y **`assets/sprites/victor.png`**. Cada hoja mide **80×130 px**: fotogramas de **20×26 px** en 4 columnas y 5 filas (los pies tocan la fila de abajo y la cabeza queda por encima de la caja de colisión, que mide 10×16 px):
 
 | fila | animación | fotogramas |
 |---|---|---|
@@ -54,7 +63,7 @@ Los sprites se generan por código, pero hay PNG listos para sustituir en **`ass
 | 3 | caer | 1 |
 | 4 | planear | 1 |
 
-Dibújalos mirando a la derecha y respeta el tamaño: si la imagen no mide 64×100, el juego usa la versión generada. Para volver a generar los PNG originales: `npm run assets`.
+Dibújalos mirando a la derecha y respeta el tamaño: si la imagen no mide 80×130, el juego usa la versión generada. Para volver a generar los PNG originales: `npm run assets`.
 
 ### Niveles
 
@@ -73,10 +82,32 @@ Los niveles son mapas de texto. `levels/level1.js` está escrito a mano y los ni
 | `c` | checkpoint |
 | `e` / `f` | bichito que pasea / mariposa que flota |
 | `G` | puerta de meta |
-| `1`-`9` | cartel (texto en `story.js`) |
+| `0`-`9` | cartel (texto en `story.js`) |
+| `>` `<` | zona de viento a favor / en contra (empuja 45 px/s) |
+| `z` | zona de baja gravedad |
+| `m` `M` | plataforma móvil horizontal (barca) / vertical (ascensor) |
+| `k` | hoja o estrella que tiembla y cae al pisarla, y reaparece |
+| `r` `R` | bloques que aparecen y desaparecen al ritmo (rosas / azules) |
+| `u` | muelle (seta, altavoz o estrella según el nivel) |
 | `T` `h` `w` `l` | decoración: árbol, arbusto, flores, farola |
 
-Los colores y la música de cada nivel están en `levels/themes.js`.
+Los colores, la música y el tipo de enemigo y de aparatos de cada nivel están en `levels/themes.js`. Los trozos con obstáculos propios de los niveles 2-5 están en `levels/chunks_themed.js` y se dibujan con coordenadas (`a.set(x, y, 'u')`, `a.fill(...)`...).
+
+### Música: canciones propias (opcional)
+
+Por defecto suena música chiptune generada por código, sin derechos de autor. Si quieres usar canciones concretas, copia los archivos (mp3, m4a u ogg) en **`assets/music/`** y asígnalos en **`assets/music/playlist.json`**:
+
+```json
+{
+  "menu": "assets/music/menu.mp3",
+  "level1": "assets/music/instituto.mp3",
+  "level4": "assets/music/concierto.mp3"
+}
+```
+
+Claves: `menu` (selección, mapa y recuerdos), `level1` … `level5` y `final`. Lo que no esté en la lista sigue sonando con el chiptune, y si un archivo falla también vuelve al chiptune. Hay más detalles en `assets/music/LEEME.txt`.
+
+> **Derechos de autor:** las canciones comerciales tienen copyright. Si subes el audio a un repositorio público de GitHub o a GitHub Pages lo estás distribuyendo y pueden retirártelo. Para algo privado, usa música libre de derechos o propia, o no subas esos archivos a GitHub.
 
 ## Probarlo en tu ordenador
 
@@ -87,7 +118,10 @@ npm install
 npm run serve
 ```
 
-y abre <http://127.0.0.1:8080/>. Las pruebas automáticas (Playwright, WebKit con emulación de iPhone) se lanzan con `npm test` y guardan capturas en `tests/out/`.
+y abre <http://127.0.0.1:8080/>. Las pruebas automáticas usan Playwright (`npx playwright install webkit chromium` la primera vez):
+
+- `npm test`: WebKit con emulación de iPhone en horizontal (controles, personajes, niveles, obstáculos, guardado, PWA). Guarda capturas en `tests/out/`.
+- `npm run test:audio`: Chromium (el WebKit de Playwright en Windows no incluye Web Audio). Comprueba música, efectos, silencio y canciones propias midiendo el sonido real.
 
 ## Publicarlo en GitHub Pages
 
@@ -122,13 +156,13 @@ Si no oyes la música, comprueba que el **interruptor de silencio** del lateral 
 index.html  manifest.json  sw.js        página, instalación PWA y modo sin conexión
 css/style.css                            estilos, controles táctiles, aviso de orientación
 src/engine/                              vista (retina), entrada, física, mapa de tiles, cámara
-src/entities/                            jugador y enemigos
-src/art/                                 sprites, tiles, fondos con parallax, partículas (todo generado por código)
+src/entities/                            jugador, enemigos y aparatos (plataformas móviles, hojas, bloques al ritmo, muelles)
+src/art/                                 sprites, enemigos, aparatos, tiles, fondos con parallax, partículas (todo generado por código)
 src/audio/audio.js                       música chiptune y efectos con Web Audio
 src/scenes/                              título, selección, mapa, juego, recuerdo, final
 src/ui/ src/state/                       texto pixel, controles táctiles, guardado
-levels/                                  textos (story.js), temas, trozos y niveles
-assets/                                  fuente, iconos, sprites y fotos de los recuerdos
+levels/                                  textos (story.js), temas, trozos (genéricos y propios de cada nivel) y niveles
+assets/                                  fuente, iconos, sprites, fotos de los recuerdos y música propia
 tests/ tools/                            pruebas con Playwright y generador de PNG
 ```
 

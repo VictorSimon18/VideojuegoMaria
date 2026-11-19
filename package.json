@@ -7,6 +7,7 @@
   "scripts": {
     "serve": "node tests/serve.mjs 8080",
     "test": "node tests/run.mjs",
+    "test:audio": "node tests/audio.mjs",
     "assets": "node tools/export-assets.mjs"
   },
   "devDependencies": { "playwright": "1.65.1" }

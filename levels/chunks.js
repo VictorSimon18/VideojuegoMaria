@@ -115,12 +115,12 @@ export function glide(w = 9) {
   ], '######' + gap + '#########');
 }
 
-/** ZONA DE VÍCTOR: cajas en el techo; hay que subir por las nubes y romperlas desde abajo. */
-export function boxGate() {
+/** ZONA DE VÍCTOR: cajas en el techo; hay que subir por las nubes y romperlas desde abajo (2 o 3 cajas). */
+export function boxGate(boxes = 2) {
   return chunk([
     '', '', '',
     '........o...o',
-    '......XXXXbbXXX',
+    boxes === 3 ? '......XXXbbbXXX' : '......XXXXbbXXX',
     '.............XX',
     '.........===.XX',
     '.............XX',
@@ -134,7 +134,8 @@ export function boxGate() {
  * y numera los carteles '?' de izquierda a derecha.
  */
 export function buildLevel(parts) {
-  const chunks = parts.map((p) => (typeof p === 'string' ? (p === 'GLIDE' ? glide(9) : p === 'GLIDE_LONG' ? glide(11) : p === 'BOXGATE' ? boxGate() : LIB[p]) : p));
+  const named = { GLIDE: () => glide(9), GLIDE_LONG: () => glide(11), BOXGATE: () => boxGate(2), BOXGATE3: () => boxGate(3) };
+  const chunks = parts.map((p) => (typeof p === 'function' ? p() : typeof p === 'string' ? (named[p] ? named[p]() : LIB[p]) : p));
   if (chunks.some((c) => !c)) throw new Error('Chunk desconocido en la lista del nivel');
   const rows = joinChunks(chunks);
   const marks = [];

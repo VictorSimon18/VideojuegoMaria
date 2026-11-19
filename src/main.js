@@ -51,6 +51,7 @@ async function boot() {
   const canvas = document.getElementById('game');
   initView(canvas);
   app.controls = initTouch();
+  audio.loadPlaylist();   // canciones propias opcionales (assets/music/playlist.json)
   try { await document.fonts.load('8px "Press Start 2P"'); } catch (_) { /* usa la fuente de reserva */ }
   const [maria, victor] = await Promise.all([loadCharSheet('maria'), loadCharSheet('victor')]);
   app.sheets.maria = maria; app.sheets.victor = victor; app.hasVictor = true;

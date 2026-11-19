@@ -19,7 +19,7 @@ const shot = (page, name) => page.screenshot({ path: path.join(out, name + '.png
 const ctx = await browser.newContext({ ...devices['iPhone 14 landscape'] });
 const page = await ctx.newPage();
 page.on('console', (m) => { if (m.type() === 'error' && !/status of 404/.test(m.text())) errors.push(m.text()); });
-page.on('response', (r) => { if (r.status() === 404 && !/assets\/memories\//.test(r.url())) errors.push('404 ' + r.url()); });
+page.on('response', (r) => { if (r.status() === 404 && !/assets\/(memories\/|music\/_missing)/.test(r.url())) errors.push('404 ' + r.url()); });
 page.on('pageerror', (e) => errors.push(String(e)));
 const sceneName = () => page.evaluate(() => { const s = window.__maria.app.scene; return s && s.ready !== false ? s.constructor.name : null; });
 const waitScene = (name) => page.waitForFunction((n) => { const s = window.__maria.app.scene; return !!s && s.constructor.name === n && s.ready !== false; }, name, { timeout: 10000 });
@@ -243,20 +243,106 @@ await page.evaluate(() => window.__maria.input.pressJump());
 await waitScene('FinalScene');
 for (const ph of [0, 1, 2]) { await page.waitForTimeout(1300); await shot(page, `4${ph}-final-${ph}`); await page.evaluate(() => window.__maria.input.pressJump()); }
 
-// ---------- Corazones al alcance (comprobación estática) y rendimiento ----------
+// ---------- Corazones al alcance (comprobación estática) ----------
 for (let n = 1; n <= 5; n++) {
   await startLevel(n);
   const r = await page.evaluate(() => {
     const sc = window.__maria.app.scene, map = sc.map, bad = []; let pits = 0;
+    const gadgets = map.spawns.filter((s) => 'kmMrRu'.includes(s.ch));
     for (const h of sc.hearts) {
-      const tx = Math.floor(h.x / 16), ty = Math.floor(h.y / 16); let best = Infinity;
-      for (let cx = tx - 1; cx <= tx + 1; cx++) for (let y = ty; y <= map.H; y++) if (map.isSolid(cx, y) || map.isOneWay(cx, y)) { best = Math.min(best, y * 16 - h.y); break; }
-      if (best === Infinity) pits++; else if (best > 99) bad.push(`(${tx},${ty}) a ${best}px`);
+      const tx = Math.floor(h.x / 16), ty = Math.floor(h.y / 16);
+      const low = map.zoneAt(tx, ty) === 'z';
+      const reach = low ? 220 : 99;
+      let best = Infinity, found = false;
+      for (let cx = tx - 1; cx <= tx + 1; cx++) for (let y = ty; y <= map.H; y++) if (map.isSolid(cx, y) || map.isOneWay(cx, y)) { best = Math.min(best, y * 16 - h.y); found = true; break; }
+      let ok = found && best <= reach;
+      for (const g of gadgets) {                       // plataformas y muelles también valen como apoyo
+        if (Math.abs(g.tx - tx) > 2) continue;
+        const top = g.ch === 'u' ? (g.ty + 1) * 16 - 8 : g.ty * 16, lim = g.ch === 'u' ? 150 : (g.ch === 'm' || g.ch === 'M' ? reach + 45 : reach);
+        const d = top - h.y; found = true;
+        if (d >= -12 && d <= lim) ok = true;
+      }
+      if (!found) pits++; else if (!ok) bad.push(`(${tx},${ty})`);
     }
     return { bad, pits, total: sc.hearts.length };
   });
-  check(r.bad.length === 0, `nivel ${n}: todos los corazones al alcance de un salto (${r.total - r.pits} sobre suelo, ${r.pits} sobre huecos para planear)${r.bad.length ? ' MAL: ' + r.bad.join(', ') : ''}`);
+  check(r.bad.length === 0, `nivel ${n}: todos los corazones al alcance (${r.total - r.pits} con apoyo, ${r.pits} sobre huecos para planear)${r.bad.length ? ' MAL: ' + r.bad.join(', ') : ''}`);
 }
+
+// ---------- Obstáculos propios de cada nivel ----------
+await startLevel(3);
+const spring = await page.evaluate(() => {   // muelle (seta)
+  const sc = window.__maria.app.scene, p = sc.player, s = sc.springs[0];
+  sc.charId = 'maria'; p.swapTo('maria', window.__maria.app.sheets.maria);
+  p.respawn(s.x + 2, s.y - 30); p.invuln = 9; p.vy = 0; sc.state = 'play'; sc.banner = 0; sc.cam.snap(p, sc.map, window.__maria.view.W, window.__maria.view.H);
+  return { n: sc.springs.length };
+});
+let minVy = 0; for (let i = 0; i < 30; i++) { minVy = Math.min(minVy, (await page.evaluate(() => window.__maria.app.scene.player.vy))); await page.waitForTimeout(20); }
+check(spring.n >= 3 && minVy < -400, `nivel 3: la seta lanza al jugador hacia arriba (vy ${minVy.toFixed(0)}, ${spring.n} setas)`);
+
+const crumb = await page.evaluate(() => {   // hoja que cae
+  const sc = window.__maria.app.scene, p = sc.player, c = sc.platforms.find((x) => x.kind === 'crumble');
+  p.respawn(c.x + 10, c.y - p.h - 1); p.invuln = 99; p.vy = 0; sc.state = 'play'; sc.cam.snap(p, sc.map, window.__maria.view.W, window.__maria.view.H);
+  return sc.platforms.filter((x) => x.kind === 'crumble').length;
+});
+await page.waitForTimeout(300);
+check(await page.evaluate(() => window.__maria.app.scene.player.onGround), 'nivel 3: se puede pisar una hoja');
+await page.waitForTimeout(900);
+check(await page.evaluate(() => window.__maria.app.scene.platforms.find((x) => x.kind === 'crumble' && x.state === 'fall') !== undefined), `nivel 3: la hoja cae tras pisarla (${crumb} hojas)`);
+await page.waitForTimeout(3600);
+check(await page.evaluate(() => window.__maria.app.scene.platforms.every((x) => x.kind !== 'crumble' || x.active)), 'nivel 3: las hojas reaparecen');
+
+await startLevel(2);
+const mv = await page.evaluate(() => {   // barca que arrastra
+  const sc = window.__maria.app.scene, p = sc.player, m = sc.platforms.find((x) => x.kind === 'moverH');
+  p.respawn(m.x + 10, m.y - p.h - 1); p.invuln = 99; p.vy = 0; sc.state = 'play'; sc.cam.snap(p, sc.map, window.__maria.view.W, window.__maria.view.H);
+  return { off: p.x - m.x, mx: m.x };
+});
+await page.waitForTimeout(1800);
+const mv2 = await page.evaluate(() => { const sc = window.__maria.app.scene, p = sc.player, m = sc.platforms.find((x) => x.kind === 'moverH'); return { off: p.x - m.x, mx: m.x, ground: p.onGround, riding: p.riding === m }; });
+check(Math.abs(mv2.mx - mv.mx) > 8 && Math.abs(mv2.off - mv.off) < 6 && mv2.ground && mv2.riding, `nivel 2: la barca arrastra al jugador (barca ${mv.mx.toFixed(0)} -> ${mv2.mx.toFixed(0)}, desfase ${(mv2.off - mv.off).toFixed(1)})`);
+const hasWind = await page.evaluate(() => { const sc = window.__maria.app.scene; return [sc.windTiles.some((t) => t.dir === 1), sc.windTiles.some((t) => t.dir === -1)]; });
+check(hasWind[0] && hasWind[1], 'nivel 2: hay zonas de viento a favor y en contra');
+await page.evaluate(() => { const sc = window.__maria.app.scene, w = sc.windTiles.find((t) => t.dir === -1); const p = sc.player; p.respawn(w.tx * 16 + 3, w.ty * 16); p.invuln = 99; p.vy = -40; p.onGround = false; sc.state = 'play'; });
+await page.waitForTimeout(60);
+check(await page.evaluate(() => window.__maria.app.scene.player.ext) === -45, 'nivel 2: el viento en contra empuja hacia atrás (-45 px/s)');
+
+await startLevel(4);
+const rh = [];
+for (let i = 0; i < 12; i++) { rh.push(await page.evaluate(() => { const sc = window.__maria.app.scene; const r = sc.platforms.find((x) => x.kind === 'rhythm' && x.group === 'r'), R = sc.platforms.find((x) => x.kind === 'rhythm' && x.group === 'R'); return [r.active, R.active]; })); await page.waitForTimeout(260); }
+check(rh.some((s) => s[0]) && rh.some((s) => !s[0]) && rh.some((s) => s[1]) && rh.some((s) => !s[1]), `nivel 4: los bloques r y R se encienden y apagan al ritmo (${rh.map((s) => (s[0] ? 'r' : '-') + (s[1] ? 'R' : '-')).join(' ')})`);
+const el = await page.evaluate(() => { const sc = window.__maria.app.scene; return { v: sc.platforms.filter((x) => x.kind === 'moverV').length, sp: sc.springs.length }; });
+check(el.v >= 3 && el.sp >= 1, `nivel 4: ${el.v} ascensores y ${el.sp} altavoz-muelle`);
+
+await startLevel(5);
+const lg = await page.evaluate(() => { const sc = window.__maria.app.scene, z = sc.lowgTiles[0], p = sc.player; p.respawn(z.tx * 16 + 3, z.ty * 16); p.invuln = 99; sc.state = 'play'; return sc.lowgTiles.length; });
+await page.waitForTimeout(60);
+check(lg > 50 && await page.evaluate(() => window.__maria.app.scene.player.gravScale) < 0.5, `nivel 5: zonas de baja gravedad (${lg} tiles)`);
+const stars = await page.evaluate(() => { const sc = window.__maria.app.scene; return { k: sc.platforms.filter((x) => x.kind === 'crumble').length, m: sc.platforms.filter((x) => x.kind === 'moverH' || x.kind === 'moverV').length, u: sc.springs.length }; });
+check(stars.k >= 8 && stars.m >= 2 && stars.u >= 1, `nivel 5: ${stars.k} estrellas que caen, ${stars.m} estrellas móviles, ${stars.u} muelle`);
+
+// ---------- Música: canciones propias (playlist) con vuelta al chiptune si falta el archivo ----------
+const wav = Buffer.alloc(44 + 8000, 128);
+wav.write('RIFF', 0); wav.writeUInt32LE(36 + 8000, 4); wav.write('WAVEfmt ', 8); wav.writeUInt32LE(16, 16); wav.writeUInt16LE(1, 20); wav.writeUInt16LE(1, 22);
+wav.writeUInt32LE(8000, 24); wav.writeUInt32LE(8000, 28); wav.writeUInt16LE(1, 32); wav.writeUInt16LE(8, 34); wav.write('data', 36); wav.writeUInt32LE(8000, 40);
+const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const testWav = path.join(rootDir, 'assets/music/_test.wav');
+fs.writeFileSync(testWav, wav);
+const ctxOk = await page.evaluate(() => !!window.__maria.app.audio.ctx);
+if (!ctxOk) console.log('INFO  este WebKit no creó el contexto de audio: se omite la prueba de música');
+else {
+  await page.evaluate(() => { const a = window.__maria.app.audio; a.playlist = { menu: 'assets/music/_test.wav' }; a.stopMusic(); a.playMusic({ bpm: 90, root: 60, seed: 1, mode: 'major' }, 'menu'); });
+  await page.waitForTimeout(400);
+  const m1 = await page.evaluate(() => { const a = window.__maria.app.audio; return { file: !!a.fileEl, key: a.musicKey, chip: !!a.timer }; });
+  check(m1.file && !m1.chip && m1.key === 'menu', 'si hay canción en playlist.json suena el archivo (no el chiptune)');
+  await page.evaluate(() => { const a = window.__maria.app.audio; a.playlist = { menu: 'assets/music/_missing.mp3' }; a.stopMusic(); a.playMusic({ bpm: 90, root: 60, seed: 1, mode: 'major' }, 'menu'); });
+  await page.waitForTimeout(900);
+  const m2 = await page.evaluate(() => { const a = window.__maria.app.audio; return { file: !!a.fileEl, chip: !!a.timer }; });
+  check(!m2.file && m2.chip, 'si el archivo de la playlist falla, vuelve al chiptune');
+  await page.evaluate(() => { const a = window.__maria.app.audio; a.playlist = {}; a.stopMusic(); });
+}
+fs.unlinkSync(testWav);
+
 // Rendimiento: el bucle de juego (JS) cuesta <1 ms por fotograma; se mide en un viewport 1x porque
 // WebKit headless de Windows no tiene GPU y limita las pantallas de alta densidad por software.
 const browserF = await webkit.launch();   // instancia limpia: sin otras páginas compitiendo por la CPU

@@ -15,6 +15,7 @@ export const THEMES = {
     grass: '#9bc45f', grassD: '#6a9a4a', dirt: '#8a5a44', dirtD: '#6b4434',
     brick: '#c46a5a', brickD: '#9a4a46', box: '#d9a05c', boxD: '#8a5a30',
     leaf: ['#f08a4b', '#ffb26b', '#c4573d'], petal: '#ffd0dc', bush: '#6a9a4a', bushL: '#8cc15a',
+    enemy: 'math',
     music: { bpm: 96, root: 60, seed: 11, mode: 'major' },
   },
   // Nivel 2 - Zaragoza: Pilar, puente de Piedra y el Ebro (se completa en la fase 3)
@@ -25,6 +26,8 @@ export const THEMES = {
     grass: '#a8c86a', grassD: '#78a050', dirt: '#9a6a4c', dirtD: '#774f3a',
     brick: '#d98a5a', brickD: '#a8603e', box: '#d9a05c', boxD: '#8a5a30',
     leaf: ['#ffb36a', '#ffd08a', '#d9784a'], petal: '#ffd6e0', bush: '#78a050', bushL: '#9cc468',
+    enemy: 'paloma', flyerWing: '#dfe6f4', flyerWingD: '#aab6d0',
+    gadgets: { mover: 'barca' },
     music: { bpm: 104, root: 62, seed: 22, mode: 'major' },
   },
   // Nivel 3 - Parque Imperial de Plaza: paseo de cita al anochecer
@@ -35,6 +38,8 @@ export const THEMES = {
     grass: '#86c06a', grassD: '#58924e', dirt: '#7a5848', dirtD: '#5e4338',
     brick: '#b86a7a', brickD: '#8e4a5e', box: '#d9a05c', boxD: '#8a5a30',
     leaf: ['#ff9ac4', '#ffc4de', '#d86a9e'], petal: '#ffe0ec', bush: '#58924e', bushL: '#7cb868',
+    enemy: 'ardilla',
+    gadgets: { spring: 'seta', crumble: 'hoja' },
     music: { bpm: 88, root: 57, seed: 33, mode: 'minor' },
   },
   // Nivel 4 - Madrid, WiZink Centre: noche de concierto
@@ -45,6 +50,8 @@ export const THEMES = {
     grass: '#6a8ad8', grassD: '#4a62b0', dirt: '#4a3a78', dirtD: '#382c60',
     brick: '#c8508a', brickD: '#963a68', box: '#e0a05c', boxD: '#8a5a30',
     leaf: ['#ff70b0', '#ffa0d0', '#c84a8a'], petal: '#ffd6f0', bush: '#4a62b0', bushL: '#6a8ad8',
+    enemy: 'nota', flyerWing: '#c8a0ff', flyerWingD: '#9a6ae0',
+    gadgets: { spring: 'altavoz', mover: 'tarima' },
     music: { bpm: 120, root: 64, seed: 44, mode: 'major' },
   },
   // Nivel 5 - sorpresa final: cielo estrellado
@@ -55,6 +62,8 @@ export const THEMES = {
     grass: '#ffb0c8', grassD: '#e0809e', dirt: '#6a4a86', dirtD: '#523a6e',
     brick: '#e0708e', brickD: '#b04e6e', box: '#e8a85c', boxD: '#8a5a30',
     leaf: ['#ffd0e0', '#fff0f4', '#e890b0'], petal: '#ffffff', bush: '#e0809e', bushL: '#ffa8c4',
+    enemy: 'estrella', flyerWing: '#ffe27a', flyerWingD: '#ffb84a',
+    gadgets: { spring: 'estrella', crumble: 'estrella', mover: 'estrella' },
     music: { bpm: 84, root: 60, seed: 55, mode: 'major' },
   },
 };

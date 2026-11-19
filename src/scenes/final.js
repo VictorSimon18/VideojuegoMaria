@@ -47,10 +47,10 @@ export class FinalScene {
     const a = Math.min(1, this.pt * 1.2); ctx.globalAlpha = a;
     const st = this.app.story;
     if (this.phase === 0) {
-      drawPattern(ctx, HEART_7, { X: '#ff5d8f', L: '#ffc2d6' }, W / 2 - 14, 24 + Math.round(Math.sin(t * 4) * 2));   // corazón grande
+      drawPattern(ctx, HEART_7, { X: '#ff5d8f', L: '#ffc2d6' }, W / 2 - 14, 14 + Math.round(Math.sin(t * 4) * 2));   // corazón grande
       ctx.save(); ctx.restore();
-      drawText(ctx, st.dedication, W / 2, 66, { align: 'center', size: 10, color: '#fff3e0', shadow: '#7a2a5a' });
-      drawLines(ctx, wrapText(ctx, st.finalMessage, W - 60), W / 2, 92, { align: 'center', size: 8, color: '#ffd98a' });
+      drawText(ctx, st.dedication, W / 2, 46, { align: 'center', size: 10, color: '#fff3e0', shadow: '#7a2a5a' });
+      drawLines(ctx, wrapText(ctx, st.finalMessage, W - 60), W / 2, 72, { align: 'center', size: 8, color: '#ffd98a' });
       const { fw, fh, anims } = CHAR_SHEET, f = Math.floor(t * 2.5) % 2;
       for (const [who, x, face] of [['maria', W / 2 - 20, 1], ['victor', W / 2 + 20, -1]]) {
         ctx.save(); ctx.translate(x, 160); ctx.scale(face * 2, 2);

@@ -57,6 +57,8 @@ export class Particles {
         const on = Math.floor(p.age * 14) % 2 === 0;
         ctx.fillRect(x, y, 1, 1);
         if (on) { ctx.fillRect(x - 1, y, 3, 1); ctx.fillRect(x, y - 1, 1, 3); }
+      } else if (p.kind === 'streak') {
+        ctx.fillStyle = p.color; ctx.fillRect(x, y, p.vx > 0 ? 7 : -7, 1);
       } else if (p.kind === 'petal') {
         ctx.fillStyle = p.color; ctx.fillRect(x, y, 2, 1); ctx.fillRect(x + 1, y + 1, 1, 1);
       } else { ctx.fillStyle = p.color; ctx.fillRect(x, y, p.size, p.size); }

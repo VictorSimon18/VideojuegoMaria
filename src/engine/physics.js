@@ -7,12 +7,13 @@ import { TILE } from './constants.js';
  * Resultado en el propio cuerpo: onGround, wall (-1/0/1), ceilTiles (tiles golpeados por arriba).
  */
 export function moveBody(b, map, dt) {
-  // ---- Eje X ----
-  b.x += b.vx * dt;
+  // ---- Eje X ---- (b.ext = velocidad externa, p. ej. viento; no se acumula en vx)
+  const ev = b.vx + (b.ext || 0);
+  b.x += ev * dt;
   b.wall = 0;
-  if (b.vx !== 0) {
+  if (ev !== 0) {
     const y0 = Math.floor(b.y / TILE), y1 = Math.floor((b.y + b.h - 0.01) / TILE);
-    if (b.vx > 0) {
+    if (ev > 0) {
       const tx = Math.floor((b.x + b.w - 0.001) / TILE);
       for (let ty = y0; ty <= y1; ty++) {
         if (map.isSolid(tx, ty)) { b.x = tx * TILE - b.w; b.vx = 0; b.wall = 1; break; }

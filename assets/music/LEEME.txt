@@ -1,0 +1,21 @@
+MÚSICA PROPIA (OPCIONAL)
+========================
+Por defecto el juego suena con música chiptune generada por código (sin derechos de autor).
+Si quieres usar canciones concretas:
+
+1. Copia aquí tus archivos de audio (mp3, m4a u ogg; mejor menos de 4 MB cada uno).
+2. Edita playlist.json y asigna cada archivo a una pantalla. Claves posibles:
+     "menu"   -> selección de personaje, mapa y recuerdos
+     "level1" ... "level5" -> cada nivel
+     "final"  -> pantalla final
+   Ejemplo:
+     {
+       "menu": "assets/music/menu.mp3",
+       "level1": "assets/music/instituto.mp3",
+       "level4": "assets/music/concierto.mp3"
+     }
+3. Lo que no esté en la lista sigue sonando con el chiptune. Si un archivo falla, también.
+
+OJO CON LOS DERECHOS DE AUTOR: las canciones comerciales tienen copyright. Si subes el audio a un
+repositorio PÚBLICO de GitHub o a GitHub Pages lo estás distribuyendo, y pueden retirártelo.
+Para algo privado, usa música libre de derechos o tuya, o no subas esos archivos a GitHub.

@@ -1,7 +1,7 @@
 // Service worker: permite jugar sin conexión y que la app se instale a pantalla completa.
 // Estrategia: se precachea todo el juego; después, "stale-while-revalidate" (se sirve lo guardado y se
 // actualiza en segundo plano). Si cambias archivos, SUBE el número de CACHE_VERSION para limpiar la caché.
-const CACHE_VERSION = 1;
+const CACHE_VERSION = 2;
 const CACHE = `videojuego-maria-v${CACHE_VERSION}`;
 
 const FILES = [
@@ -13,12 +13,13 @@ const FILES = [
   'src/engine/constants.js', 'src/engine/view.js', 'src/engine/input.js', 'src/engine/physics.js',
   'src/engine/tilemap.js', 'src/engine/camera.js',
   'src/art/pixel.js', 'src/art/sprites.js', 'src/art/tiles.js', 'src/art/backgrounds.js', 'src/art/particles.js',
+  'src/art/enemies.js', 'src/art/gadget_art.js',
   'src/audio/audio.js', 'src/state/save.js',
-  'src/entities/player.js', 'src/entities/enemy.js',
+  'src/entities/player.js', 'src/entities/enemy.js', 'src/entities/gadgets.js',
   'src/ui/text.js', 'src/ui/touch.js',
   'src/scenes/title.js', 'src/scenes/select.js', 'src/scenes/map.js', 'src/scenes/game.js',
   'src/scenes/memory.js', 'src/scenes/final.js',
-  'levels/index.js', 'levels/story.js', 'levels/themes.js', 'levels/chunks.js',
+  'levels/index.js', 'levels/story.js', 'levels/themes.js', 'levels/chunks.js', 'levels/chunks_themed.js',
   'levels/level1.js', 'levels/level2.js', 'levels/level3.js', 'levels/level4.js', 'levels/level5.js',
 ];
 
@@ -38,7 +39,10 @@ self.addEventListener('activate', (e) => {
 
 self.addEventListener('fetch', (e) => {
   const req = e.request;
-  if (req.method !== 'GET' || new URL(req.url).origin !== location.origin) return;
+  const url = new URL(req.url);
+  if (req.method !== 'GET' || url.origin !== location.origin) return;
+  // el audio (peticiones Range en Safari) y las canciones propias no pasan por la caché del service worker
+  if (req.headers.has('range') || /\/assets\/music\/.+\.(mp3|m4a|aac|ogg|wav)$/i.test(url.pathname)) return;
   e.respondWith(
     caches.open(CACHE).then(async (cache) => {
       const cached = await cache.match(req, { ignoreSearch: true });
