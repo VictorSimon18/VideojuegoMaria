@@ -37,11 +37,14 @@ export class TitleScene {
   draw(ctx) {
     const W = view.W, H = view.H, t = this.t;
     this.bg.draw(ctx, t * 14, 0, W, H, t);
-    ctx.fillStyle = '#4c305c'; ctx.fillRect(0, 160, W, H - 160);
-    ctx.fillStyle = '#9bc45f'; ctx.fillRect(0, 160, W, 4);
-    ctx.fillStyle = '#6a9a4a'; ctx.fillRect(0, 163, W, 1);
+    const th = THEMES.azara;
+    ctx.fillStyle = th.dirt; ctx.fillRect(0, 160, W, H - 160);
+    ctx.fillStyle = th.grass; ctx.fillRect(0, 160, W, 4);
+    ctx.fillStyle = th.grassL; ctx.fillRect(0, 160, W, 1);
+    ctx.fillStyle = th.grassD; ctx.fillRect(0, 163, W, 2);
     this.particles.draw(ctx, 0, 0);
 
+    ctx.fillStyle = 'rgba(29,16,38,0.5)'; ctx.fillRect(0, 26, W, 52);   // banda para que el título se lea sobre la fachada
     const bob = Math.round(Math.sin(t * 2) * 2);
     drawText(ctx, this.app.story.title, W / 2, 34 + bob, { align: 'center', size: 16, color: '#fff3e0', shadow: '#7a2a5a' });
     drawText(ctx, this.app.story.subtitle, W / 2, 62, { align: 'center', size: 8, color: '#ffd98a' });

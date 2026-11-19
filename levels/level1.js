@@ -8,7 +8,7 @@ const chunks = [
   // 1 - inicio tranquilo
   chunk([
     '', '', '', '', '', '', '', '', '',
-    '..S..1..o..T..o...h...w.',
+    '..S..1..o..B..o...h...w.',
   ], '########################'),
 
   // 2 - primer hueco con checkpoint
@@ -54,7 +54,7 @@ const chunks = [
     '...........o',
     '..........XXX',
     '.........XXXXX',
-    '...T....XXXXXXX........l',
+    '...B....XXXXXXX........l',
   ], '########################'),
 
   // 7 - ZONA DE MARÍA: hueco enorme, solo se cruza planeando

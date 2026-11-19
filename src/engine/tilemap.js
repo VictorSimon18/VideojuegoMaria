@@ -13,7 +13,7 @@ import { makeCanvas } from '../art/pixel.js';
 const SOLID = new Set(['#', 'X', 'b']);
 const ENTITY = new Set(['S', 'o', 'c', 'e', 'f', 'G', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
   'm', 'M', 'k', 'r', 'R', 'u']);   // m/M movers, k hoja/estrella que cae, r/R bloques al ritmo, u muelle
-const DECOR = new Set(['T', 'h', 'w', 'l']);
+const DECOR = new Set(['T', 'h', 'w', 'l', 'B']);   // B = canasta de baloncesto
 const ZONES = { '>': 'viento a favor', '<': 'viento en contra', z: 'baja gravedad' };
 const TILES = new Set(['.', ' ', '#', 'X', 'b', '=', '^', '>', '<', 'z']);
 

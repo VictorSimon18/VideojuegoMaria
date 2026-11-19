@@ -217,6 +217,22 @@ export function makeItemSprites(theme) {
     return o;
   })();
 
+  // En el instituto la meta es la verja negra con postes amarillos (como la entrada real)
+  if (theme && theme.goal === 'insti') {
+    const o = makeCanvas(26 * 2, 36), og = o.getContext('2d');
+    for (let f = 0; f < 2; f++) {
+      const c = makeCanvas(26, 36), g = c.getContext('2d');
+      R(g, f ? '#ffe9b0' : '#ffd98a', 5, 8, 16, 28);                                  // luz al otro lado de la verja
+      R(g, '#e8b84a', 1, 6, 4, 30); R(g, '#f4d070', 1, 6, 1, 30); R(g, '#e8b84a', 21, 6, 4, 30); R(g, '#f4d070', 21, 6, 1, 30);
+      R(g, '#e8b84a', 1, 4, 24, 3);
+      for (let x = 6; x < 21; x += 3) R(g, '#2a2a30', x, 8, 1, 28);
+      R(g, '#2a2a30', 5, 8, 16, 1); R(g, '#2a2a30', 5, 20, 16, 1);
+      drawPattern(g, ['.X.X.', 'XXXXX', '.XXX.', '..X..'], { X: '#ff6f9c' }, 11, 0 + f);
+      outline(g.canvas); og.drawImage(c, f * 26, 0);
+    }
+    out.goal = o;
+  }
+
   // Bichito paseante (2 fotogramas)
   out.blob = (() => {
     const o = makeCanvas(14 * 2, 13); const og = o.getContext('2d');

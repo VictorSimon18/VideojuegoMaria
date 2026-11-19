@@ -1,5 +1,6 @@
 // Fondos con parallax de 3 capas (lejos, medio, cerca) + cielo con sol, estrellas y nubes.
 import { makeCanvas, rng, rect as R, pixelEllipse, lerpColor } from './pixel.js';
+import { facadeFar, patioMid } from './facade.js';
 
 const TAU = Math.PI * 2;
 const mod = (a, p) => ((a % p) + p) % p;
@@ -197,13 +198,14 @@ function starsFar(th, pw, H) {
   return c;
 }
 
-const FARS = { school: schoolFar, pilar: pilarFar, park: parkFar, city: cityFar, stars: starsFar };
+const FARS = { school: facadeFar, pilar: pilarFar, park: parkFar, city: cityFar, stars: starsFar };
+const MIDS = { school: patioMid };   // capa media propia (si no, colinas)
 
 export function makeBackground(th, H = 180) {
   const sky = skyCanvas(th, H);
   const clouds = cloudsLayer(th, 480, H);
   const far = (FARS[th.bgKind] || genericFar)(th, 480, H);
-  const mid = midLayer(th, 400, H);
+  const mid = (MIDS[th.bgKind] || midLayer)(th, 400, H);
   const near = nearLayer(th, 320, H);
   const r = rng(77);
   const stars = Array.from({ length: 46 }, () => ({ x: r() * 800, y: r() * 80, p: r() * TAU }));

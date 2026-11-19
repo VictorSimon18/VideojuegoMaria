@@ -10,10 +10,11 @@ export const THEMES = {
   // Nivel 1 - Instituto Félix de Azara: atardecer de otoño
   azara: {
     ...base, bgKind: 'school',
+    floor: 'patio', cloudSkin: 'banco', decor: 'patio', goal: 'insti',   // suelo de pista, bancos, canastas y verja del instituto
     sky: ['#3d2b63', '#c4577a', '#ffb374'], sun: '#ffe1a8',
-    far: '#8c5a86', mid: '#6f4676', near: '#4c305c', cloudBg: '#ffc9b8',
-    grass: '#9bc45f', grassD: '#6a9a4a', dirt: '#8a5a44', dirtD: '#6b4434',
-    brick: '#c46a5a', brickD: '#9a4a46', box: '#d9a05c', boxD: '#8a5a30',
+    far: '#8c5a86', mid: '#6f4676', near: '#3a2a4c', cloudBg: '#ffc9b8',
+    grass: '#3f84e0', grassD: '#2a5fb4', grassL: '#7ab6f6', dirt: '#7c8296', dirtD: '#5d637a', dirtL: '#a2a8ba',
+    brick: '#eaa270', brickD: '#b87a50', brickL: '#f6c294', box: '#d9a05c', boxD: '#8a5a30',
     leaf: ['#f08a4b', '#ffb26b', '#c4573d'], petal: '#ffd0dc', bush: '#6a9a4a', bushL: '#8cc15a',
     enemy: 'math',
     music: { bpm: 96, root: 60, seed: 11, mode: 'major' },

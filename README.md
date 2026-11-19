@@ -31,6 +31,8 @@ Un videojuego de plataformas 2D en pixel art, hecho con cariño. Se juega en el 
 
 Se pueden usar varios dedos a la vez (moverse y saltar). Si el móvil está en vertical aparece un aviso para girarlo.
 
+El fondo y el suelo del nivel 1 están dibujados a partir de fotos del IES Félix de Azara: la fachada (paredes verde salvia y salmón, ventanas con persianas, azotea con banderas, pinos y plátanos) y el patio (pistas azules con líneas blancas, bordes naranjas, canastas, bancos y setos). Está en `src/art/facade.js`.
+
 ## Cómo editar el juego
 
 ### Textos
