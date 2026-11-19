@@ -3,6 +3,7 @@
 //   paloma   -> palomas del Pilar, nivel 2 (Zaragoza)
 //   ardilla  -> ardillas del parque, nivel 3
 //   coche    -> coche rojo, nivel 3 (Parque Imperial)
+//   cabra    -> cabritas negras, nivel 4 (concierto de Quevedo)
 //   nota     -> notas musicales, nivel 4 (concierto)
 //   estrella -> estrellitas, nivel 5
 // Cada paseante son 2 fotogramas de 14x13. Se elige con theme.enemy en levels/themes.js.
@@ -58,6 +59,17 @@ const WALKERS = {
     R(g, '#c8803c', 8, 2, 1, 1); R(g, '#c8803c', 11, 2, 1, 1);                                // orejas
     R(g, '#2a1620', 10, 5, 1, 1); R(g, '#2a1620', 13, 6, 1, 1); R(g, '#ff9ac4', 9, 6, 1, 1);  // ojo, nariz, mejilla
     R(g, '#8a5a2c', f ? 5 : 4, 10, 2, 2); R(g, '#8a5a2c', f ? 8 : 9, 10, 2, 2);
+  })],
+  cabra: () => [frame2((g, f) => {
+    const dy = f ? -1 : 0;
+    R(g, '#2a2630', 2, 5 + dy, 8, 5); R(g, '#3a3640', 3, 5 + dy, 6, 1);                      // cuerpo negro
+    R(g, '#2a2630', 9, 2 + dy, 4, 5); R(g, '#2a2630', 12, 4 + dy, 2, 3);                    // cabeza y hocico
+    R(g, '#d8d0c0', 9, 0 + dy, 1, 2); R(g, '#d8d0c0', 11, 0 + dy, 1, 2);                    // cuernecitos
+    R(g, '#2a2630', 8, 2 + dy, 1, 2);                                                        // oreja
+    R(g, '#ffffff', 11, 3 + dy, 1, 1); R(g, '#ff9ac4', 13, 5 + dy, 1, 1);                   // ojo y morro
+    R(g, '#2a2630', 1, 5 + dy, 1, 2);                                                        // rabito
+    R(g, '#3a3640', f ? 3 : 2, 10, 1, 3); R(g, '#3a3640', f ? 8 : 9, 10, 1, 3); R(g, '#3a3640', f ? 5 : 6, 10, 1, 3);
+    R(g, '#6a6070', 2, 12, 1, 1); R(g, '#6a6070', 9, 12, 1, 1);
   })],
   coche: () => [frame2((g, f) => {
     const dy = f ? 0 : 1;   // el coche "bota" con el motor

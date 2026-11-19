@@ -2,6 +2,7 @@
 // basta con dejar assets/sprites/maria.png y assets/sprites/victor.png con el formato de
 // hoja descrito en CHAR_SHEET (fotogramas de 20x26, 4 columnas x 5 filas).
 import { makeCanvas, rect as R, outline, drawPattern, heartSprite, pixelEllipse } from './pixel.js';
+import { quevedoGoal } from './arena.js';
 
 export const CHAR_SHEET = {
   fw: 20, fh: 26, cols: 4,
@@ -216,6 +217,8 @@ export function makeItemSprites(theme) {
     }
     return o;
   })();
+
+  if (theme && theme.goal === 'quevedo') out.goal = quevedoGoal();   // nivel 4: Quevedo con una cabrita
 
   // En el instituto la meta es la verja negra con postes amarillos (como la entrada real)
   if (theme && theme.goal === 'insti') {

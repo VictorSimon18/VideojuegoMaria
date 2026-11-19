@@ -1,3 +1,4 @@
+import { golpitoScore } from './golpito.js';
 // Temas visuales y musicales de cada nivel (paletas cálidas y románticas).
 // Para cambiar el aspecto de un nivel basta con tocar los colores de aquí.
 const base = {
@@ -48,14 +49,15 @@ export const THEMES = {
   // Nivel 4 - Madrid, WiZink Centre: noche de concierto
   wizink: {
     ...base, bgKind: 'city',
+    floor: 'plaza', cloudSkin: 'caja', decor: 'concierto', goal: 'quevedo', floorLine: '#ff70b0',   // escenario con led rosa, cajas de equipo, altavoces; meta: Quevedo
     sky: ['#140f2e', '#4a2a7a', '#d0587a'], sun: '#ffd0e8',
     far: '#4a3478', mid: '#382860', near: '#281c4a', cloudBg: '#9a70c8',
-    grass: '#6a8ad8', grassD: '#4a62b0', dirt: '#4a3a78', dirtD: '#382c60',
+    grass: '#3a3470', grassD: '#26204a', grassL: '#6a62b8', dirt: '#2a2452', dirtD: '#1c1838', dirtL: '#463e80',
     brick: '#c8508a', brickD: '#963a68', box: '#e0a05c', boxD: '#8a5a30',
     leaf: ['#ff70b0', '#ffa0d0', '#c84a8a'], petal: '#ffd6f0', bush: '#4a62b0', bushL: '#6a8ad8',
-    enemy: 'nota', flyerWing: '#c8a0ff', flyerWingD: '#9a6ae0',
+    enemy: 'cabra', flyerWing: '#c8a0ff', flyerWingD: '#9a6ae0',
     gadgets: { spring: 'altavoz', mover: 'tarima' },
-    music: { bpm: 120, root: 64, seed: 44, mode: 'major' },
+    music: { bpm: 103, root: 65, seed: 44, mode: 'minor', score: golpitoScore(), total: 64 },   // "Al golpito" (aproximación)
   },
   // Nivel 5 - sorpresa final: cielo estrellado
   final: {

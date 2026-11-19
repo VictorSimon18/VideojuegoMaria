@@ -45,6 +45,12 @@ function bench(g) {
   R(g, '#3a3a44', 1, 4, 2, 2); R(g, '#3a3a44', 13, 4, 2, 2);
 }
 
+/** Caja de transporte de equipo (flight case) con esquinas metálicas: plataforma del nivel 4. */
+function flightcase(g) {
+  R(g, '#3a3450', 0, 0, T, 5); R(g, '#5a5278', 0, 0, T, 1); R(g, '#1e1a30', 0, 4, T, 1);
+  R(g, '#b8b8c8', 0, 0, 2, 5); R(g, '#b8b8c8', 14, 0, 2, 5); R(g, '#8a8a9c', 6, 2, 4, 1);
+}
+
 /** Jardinera de la plaza: piedra con flores (plataforma del nivel 2). */
 function planter(g) {
   R(g, '#5f9448', 0, 0, T, 2); R(g, '#86b85a', 0, 0, T, 1);
@@ -97,7 +103,7 @@ export function makeTileset(th) {
   const dirt = [0, 1, 2].map(() => mk((g) => (patio ? slab(g, th, r) : dirtBase(g, th, r))));
   const sBrick = mk((g) => brick(g, th));
   const sBox = mk((g) => box(g, th));
-  const sCloud = mk((g) => (th.cloudSkin === 'banco' ? bench(g) : th.cloudSkin === 'jardinera' ? planter(g) : cloud(g, th)));
+  const sCloud = mk((g) => (th.cloudSkin === 'banco' ? bench(g) : th.cloudSkin === 'jardinera' ? planter(g) : th.cloudSkin === 'caja' ? flightcase(g) : cloud(g, th)));
   const sThorn = mk((g) => thorn(g, th));
   return {
     pick(map, tx, ty) {
@@ -144,6 +150,31 @@ function makePatioDecor(th) {
   };
 }
 
+/** Concierto: torres de altavoces, monitores de escenario, micros y focos. */
+function makeStageDecor(th) {
+  const r = rng(99);
+  return function paint(g, ch, tx, ty) {
+    const cx = tx * T + 8, by = (ty + 1) * T;
+    if (ch === 'T') {   // torre de altavoces
+      for (let k = 0; k < 3; k++) {
+        const y = by - 16 * (k + 1);
+        R(g, '#1c1828', cx - 10, y, 20, 16); R(g, '#34304a', cx - 10, y, 20, 1);
+        pixelEllipse(g, '#0c0a14', cx, y + 9, 6, 6); pixelEllipse(g, '#4a4668', cx, y + 9, 3, 3); R(g, '#ff70b0', cx - 1, y + 8, 2, 2);
+        R(g, '#6a6688', cx - 9, y + 2, 1, 1); R(g, '#6a6688', cx + 8, y + 2, 1, 1);
+      }
+    } else if (ch === 'h') {   // monitor de escenario (cuña)
+      R(g, '#1c1828', cx - 12, by - 8, 24, 8); R(g, '#34304a', cx - 12, by - 8, 24, 1); R(g, '#0c0a14', cx - 9, by - 6, 18, 4);
+      for (let i = -8; i < 9; i += 2) R(g, '#4a4668', cx + i, by - 5, 1, 2);
+    } else if (ch === 'w') {   // pie de micro
+      R(g, '#6a6688', cx, by - 22, 1, 22); R(g, '#3a3450', cx - 4, by - 1, 9, 1); R(g, '#8a86a8', cx - 1, by - 26, 3, 5); R(g, '#c8c4e0', cx - 1, by - 27, 3, 1);
+    } else if (ch === 'l') {   // foco con haz de luz
+      R(g, '#3a3450', cx - 1, by - 40, 2, 40); R(g, '#2a2640', cx - 4, by - 3, 8, 3); R(g, '#2a2640', cx - 4, by - 46, 8, 7);
+      g.fillStyle = 'rgba(255,230,245,0.12)'; g.beginPath(); g.moveTo(cx - 3, by - 40); g.lineTo(cx - 22, by); g.lineTo(cx + 22, by); g.lineTo(cx + 3, by - 40); g.closePath(); g.fill();
+      R(g, '#fff4f8', cx - 3, by - 40, 6, 2);
+    }
+  };
+}
+
 /** Parque Imperial: arbolitos jóvenes, matojos secos, bolardos amarillos y farolas de brazo. */
 function makeParkDecor(th) {
   const r = rng(99);
@@ -185,6 +216,7 @@ export function makeDecorPainter(th) {
   if (th.decor === 'patio') return makePatioDecor(th);
   if (th.decor === 'plaza') return makePlazaDecor(th);
   if (th.decor === 'parque') return makeParkDecor(th);
+  if (th.decor === 'concierto') return makeStageDecor(th);
   const r = rng(99);
   return function paint(g, ch, tx, ty) {
     const cx = tx * T + 8, by = (ty + 1) * T;

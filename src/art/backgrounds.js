@@ -3,6 +3,7 @@ import { makeCanvas, rng, rect as R, pixelEllipse, lerpColor } from './pixel.js'
 import { facadeFar, patioMid } from './facade.js';
 import { plazaFar, plazaMid } from './plaza.js';
 import { parkFar as parkFarNew, parkMid } from './park.js';
+import { arenaFar, arenaMid } from './arena.js';
 
 const TAU = Math.PI * 2;
 const mod = (a, p) => ((a % p) + p) % p;
@@ -200,8 +201,8 @@ function starsFar(th, pw, H) {
   return c;
 }
 
-const FARS = { school: facadeFar, pilar: plazaFar, park: parkFarNew, city: cityFar, stars: starsFar };
-const MIDS = { school: patioMid, pilar: plazaMid, park: parkMid };   // capa media propia (si no, colinas)
+const FARS = { school: facadeFar, pilar: plazaFar, park: parkFarNew, city: arenaFar, stars: starsFar };
+const MIDS = { school: patioMid, pilar: plazaMid, park: parkMid, city: arenaMid };   // capa media propia (si no, colinas)
 
 export function makeBackground(th, H = 180) {
   const sky = skyCanvas(th, H);

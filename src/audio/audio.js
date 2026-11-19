@@ -87,6 +87,7 @@ class AudioEngine {
   // ---------- Música ----------
   /** Genera una pieza suave determinista a partir de {bpm, root, seed, mode}. */
   buildTrack(p) {
+    if (p.score) return { bpm: p.bpm, steps: p.score, total: p.total || 64 };   // pieza escrita a mano (nivel 4)
     let s = p.seed | 0;
     const rnd = () => { s = (s * 1664525 + 1013904223) | 0; return ((s >>> 8) & 0xffff) / 65536; };
     const major = p.mode !== 'minor';
@@ -191,8 +192,9 @@ class AudioEngine {
 
   _note(e, t0, dur) {
     const o = this.ctx.createOscillator(), g = this.ctx.createGain();
-    const cfg = { lead: ['square', 0.045], arp: ['triangle', 0.05], bass: ['triangle', 0.1] }[e.type];
+    const cfg = { lead: ['square', 0.045], arp: ['triangle', 0.05], bass: ['triangle', 0.1], kick: ['sine', 0.16], snare: ['square', 0.02], hat: ['square', 0.012] }[e.type];
     o.type = cfg[0]; o.frequency.value = midiToFreq(e.midi);
+    if (e.type === 'kick') { o.frequency.setValueAtTime(110, t0); o.frequency.exponentialRampToValueAtTime(40, t0 + 0.12); }
     const len = dur * e.len;
     g.gain.setValueAtTime(0.0001, t0);
     g.gain.exponentialRampToValueAtTime(cfg[1], t0 + 0.02);
