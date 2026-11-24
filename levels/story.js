@@ -90,13 +90,8 @@ export const story = {
       name: 'Una sorpresa',
       subtitle: 'Casi al final',
       signs: {
-        1: 'Casi hemos llegado al final.',
-        2: 'Aquí arriba la gravedad pesa menos. Como cuando estoy contigo.',
-        3: 'Las hojas secas caen si te quedas quieto. ¡Sigue subiendo!',
-        4: 'Mira todo lo que hemos recorrido juntos.',
-        5: 'Hueco enorme. María planea: mantén el salto en el aire.',
-        6: 'Cajas en lo alto. Víctor las rompe desde abajo.',
-        7: 'Ojalá algún día tengamos nuestra casa y podamos formar una familia. Voy a luchar por ello hasta que eso ocurra. Te amo, María.',
+        // Carteles vacíos a propósito: se rellenarán más adelante.
+        1: '', 2: '', 3: '', 4: '', 5: '', 6: '', 7: '',
       },
       memory: { title: 'Sorpresa', text: 'Ojalá algún día tengamos nuestra casa y podamos formar una familia. Voy a luchar por ello hasta que eso ocurra. Te amo, María.', photo: 'assets/memories/nivel5.jpg' },
     },

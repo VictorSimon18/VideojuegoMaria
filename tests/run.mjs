@@ -198,7 +198,7 @@ for (let n = 2; n <= 5; n++) {
       signTexts: Object.keys(sc.def.signs).length, signs: sc.signs.length, boxes, gap: best, cps: sc.checkpoints.length, name: sc.def.name };
   });
   check(info.goal && info.hearts >= 10 && info.W > 250, `nivel ${n} (${info.name}): ${info.W} tiles, ${info.hearts} corazones, meta`);
-  const emptyOk = n === 2;   // nivel 2: carteles vacíos a propósito (el usuario los rellenará)
+  const emptyOk = n === 2 || n === 5;   // niveles 2 y 5: carteles vacíos a propósito (el usuario los rellenará)
   check(emptyOk ? info.signs === 7 : (info.signsMissing.length === 0 && info.signs === info.signTexts), `nivel ${n}: ${info.signs} carteles${emptyOk ? ' (vacíos a propósito)' : ', todos con texto en story.js'}`);
   check(info.boxes >= 2 && info.gap >= 9, `nivel ${n}: tiene zona de Víctor (${info.boxes} cajas) y de María (hueco de ${info.gap})`);
   await shot(page, `20-nivel${n}-inicio`);
