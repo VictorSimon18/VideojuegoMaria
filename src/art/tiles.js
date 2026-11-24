@@ -2,6 +2,7 @@
 import { makeCanvas, rng, rect as R, pixelEllipse } from './pixel.js';
 import { pine, plane } from './facade.js';
 import { youngTree, armLamp } from './park.js';
+import { barePlane, streetLamp } from './calle.js';
 
 const T = 16;
 
@@ -150,6 +151,21 @@ function makePatioDecor(th) {
   };
 }
 
+/** Calle de Zaragoza: plátanos sin hojas, setos bajos, bolardos y farolas. */
+function makeStreetDecor(th) {
+  const r = rng(99);
+  return function paint(g, ch, tx, ty) {
+    const cx = tx * T + 8, by = (ty + 1) * T;
+    if (ch === 'T') barePlane(g, cx, by, 54 + (tx % 4) * 4, r);
+    else if (ch === 'h') {   // mata de hierba en un alcorque
+      R(g, '#8a8a94', cx - 8, by - 2, 16, 2);
+      for (let i = -6; i < 7; i += 2) R(g, r() < 0.5 ? '#7a9a4a' : '#9a8a4a', cx + i, by - 3 - Math.floor(r() * 5), 1, 4 + Math.floor(r() * 3));
+    } else if (ch === 'w') {   // bolardos
+      for (const i of [-6, 0, 6]) { R(g, '#7a7a86', cx + i - 1, by - 9, 3, 9); R(g, '#a8a8b4', cx + i - 1, by - 9, 3, 1); }
+    } else if (ch === 'l') streetLamp(g, cx, by, 52);
+  };
+}
+
 /** Concierto: torres de altavoces, monitores de escenario, micros y focos. */
 function makeStageDecor(th) {
   const r = rng(99);
@@ -217,6 +233,7 @@ export function makeDecorPainter(th) {
   if (th.decor === 'plaza') return makePlazaDecor(th);
   if (th.decor === 'parque') return makeParkDecor(th);
   if (th.decor === 'concierto') return makeStageDecor(th);
+  if (th.decor === 'calle') return makeStreetDecor(th);
   const r = rng(99);
   return function paint(g, ch, tx, ty) {
     const cx = tx * T + 8, by = (ty + 1) * T;

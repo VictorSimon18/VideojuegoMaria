@@ -59,7 +59,20 @@ export const THEMES = {
     gadgets: { spring: 'altavoz', mover: 'tarima' },
     music: { bpm: 103, root: 65, seed: 44, mode: 'minor', score: golpitoScore(), total: 64 },   // "Al golpito" (aproximación)
   },
-  // Nivel 5 - sorpresa final: cielo estrellado
+  // Nivel 5 - calle genérica de Zaragoza, atardecer; al final, una casa con tres niños
+  calle: {
+    ...base, bgKind: 'calle',
+    floor: 'plaza', cloudSkin: 'banco', decor: 'calle', goal: 'casa', floorLine: '#7c7a88',   // acera de adoquín rosado con bordillo, bancos, plátanos y farolas
+    sky: ['#34345e', '#b0708a', '#f6c49a'], sun: '#fff0d0',
+    far: '#8a6a86', mid: '#6a4a78', near: '#4a3860', cloudBg: '#f0c8b8',
+    grass: '#e2bc9c', grassD: '#b8906e', grassL: '#f4d8bc', dirt: '#cc9f80', dirtD: '#a47c60', dirtL: '#e6bea0',
+    brick: '#b8604a', brickD: '#8e4636', brickL: '#d8806a', box: '#d9a05c', boxD: '#8a5a30',
+    leaf: ['#e0a070', '#f0c090', '#c07850'], petal: '#fff0e0', bush: '#6a8a4a', bushL: '#8aaa5a',
+    enemy: 'paloma', flyerWing: '#dfe6f4', flyerWingD: '#aab6d0',
+    gadgets: { mover: 'barca', crumble: 'hoja' },
+    music: { bpm: 84, root: 60, seed: 55, mode: 'major' },
+  },
+  // Pantalla final: cielo estrellado
   final: {
     ...base, bgKind: 'stars',
     sky: ['#120c2c', '#5a2a7a', '#ff8aa8'], sun: '#fff0d0',

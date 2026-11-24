@@ -86,19 +86,19 @@ export const story = {
       memory: { title: 'Recuerdo 4', text: 'Una ilusión compartida. (Escribe aquí vuestro recuerdo.)', photo: 'assets/memories/nivel4.jpg' },
     },
     {
-      id: 5, theme: 'final',
+      id: 5, theme: 'calle',
       name: 'Una sorpresa',
       subtitle: 'Casi al final',
       signs: {
         1: 'Casi hemos llegado al final.',
         2: 'Aquí arriba la gravedad pesa menos. Como cuando estoy contigo.',
-        3: 'Las estrellas se apagan si te paras. ¡Sigue subiendo!',
+        3: 'Las hojas secas caen si te quedas quieto. ¡Sigue subiendo!',
         4: 'Mira todo lo que hemos recorrido juntos.',
         5: 'Hueco enorme. María planea: mantén el salto en el aire.',
         6: 'Cajas en lo alto. Víctor las rompe desde abajo.',
-        7: 'Aquí irá la sorpresa final. (Pendiente de escribir.)',
+        7: 'Ojalá algún día tengamos nuestra casa y podamos formar una familia. Voy a luchar por ello hasta que eso ocurra. Te amo, María.',
       },
-      memory: { title: 'Sorpresa', text: 'Aquí irá la sorpresa final. (Pendiente de escribir.)', photo: 'assets/memories/nivel5.jpg' },
+      memory: { title: 'Sorpresa', text: 'Ojalá algún día tengamos nuestra casa y podamos formar una familia. Voy a luchar por ello hasta que eso ocurra. Te amo, María.', photo: 'assets/memories/nivel5.jpg' },
     },
   ],
 };

@@ -289,8 +289,8 @@ export class GameScene {
       ctx.drawImage(this.spr.checkpoint, f * 16, 0, 16, 26, c.tx * TILE - cx, (c.ty + 1) * TILE - 26 - cy, 16, 26);
     }
     if (this.goal) {
-      const f = Math.floor(t * 3) % 2, g = this.goal;
-      ctx.drawImage(this.spr.goal, f * 26, 0, 26, 36, g.tx * TILE - 5 - cx, (g.ty + 1) * TILE - 36 - cy, 26, 36);
+      const f = Math.floor(t * 3) % 2, g = this.goal, gw = this.spr.goal.width / 2, gh = this.spr.goal.height;
+      ctx.drawImage(this.spr.goal, f * gw, 0, gw, gh, g.tx * TILE + 8 - gw / 2 - cx, (g.ty + 1) * TILE - gh - cy, gw, gh);
     }
     for (const h of this.hearts) {
       if (h.got) continue;
