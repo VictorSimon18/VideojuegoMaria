@@ -50,7 +50,7 @@ export class MemoryScene {
     if (this.photo) {
       const r = Math.max(aw / this.photo.width, ah / this.photo.height), sw = aw / r, sh = ah / r;
       ctx.imageSmoothingEnabled = true;
-      ctx.drawImage(this.photo, (this.photo.width - sw) / 2, (this.photo.height - sh) / 2, sw, sh, ax, ay, aw, ah);
+      ctx.drawImage(this.photo, (this.photo.width - sw) / 2, (this.photo.height - sh) * 0.3, sw, sh, ax, ay, aw, ah);
       ctx.imageSmoothingEnabled = false;
     } else {
       ctx.fillStyle = '#e88aa8'; ctx.fillRect(ax, ay, aw, ah);
