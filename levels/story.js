@@ -92,10 +92,15 @@ export const story = {
       name: 'Una sorpresa',
       subtitle: 'Casi al final',
       signs: {
-        // Carteles vacíos a propósito: se rellenarán más adelante.
-        1: '', 2: '', 3: '', 4: '', 5: '', 6: '', 7: '',
+        1: 'Último nivel',
+        2: 'Espero que no se te haya hecho largo',
+        3: 'Después de esto no me llames friki',
+        4: 'Como no te haya molao me mato',
+        5: 'Y aún te quedan 23 regalos',
+        6: 'Ya casi lo acabas',
+        7: 'Te amo',
       },
-      memory: { title: 'Sorpresa', text: 'Ojalá algún día tengamos nuestra casa y podamos formar una familia. Voy a luchar por ello hasta que eso ocurra. Te amo, María.', photo: 'assets/memories/nivel5.jpg' },
+      memory: { title: 'Sorpresa', text: 'Espero que te haya gustado, lo he hecho con todo el cariño del mundo, te amo mucho mi vida', photo: 'assets/memories/nivel5.jpg' },
     },
   ],
 };
