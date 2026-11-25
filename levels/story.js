@@ -62,8 +62,13 @@ export const story = {
       name: 'Parque Imperial de Plaza',
       subtitle: 'Un paseo, una cita',
       signs: {
-        // Carteles vacíos a propósito: se rellenarán más adelante.
-        1: '', 2: '', 3: '', 4: '', 5: '', 6: '', 7: '',
+        1: 'Este nivel es más difícil',
+        2: 'Cuidao con las bemetas',
+        3: 'En el BM no se chilla',
+        4: 'Unos nuggets en el coche y tirando',
+        5: 'La de gasofa que habré quemao viniendo a este parking',
+        6: 'Has contado cuántos conejos hay escondidos?',
+        7: 'Ahora toca un viaje',
       },
       memory: { title: 'Recuerdo 3', text: '', photo: 'assets/memories/nivel3.jpg' },
     },
