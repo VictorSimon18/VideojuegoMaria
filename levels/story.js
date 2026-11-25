@@ -28,8 +28,13 @@ export const story = {
       name: 'Instituto Félix de Azara',
       subtitle: 'Donde todo empezó',
       signs: {
-        // Carteles vacíos a propósito: se rellenarán más adelante.
-        1: '', 2: '', 3: '', 4: '', 5: '', 6: '', 7: '',
+        1: 'Empieza el juego',
+        2: 'Espero que no se te haga difícil',
+        3: 'Oye tú vas al Feliz no? Jajaja',
+        4: 'Quién te iba a decir hace 4 años que ese feo sería tu novio',
+        5: 'Ten cuidado con los signos matemáticos que te matan',
+        6: 'Has recogido todos los corazones?',
+        7: 'Al siguiente nivel',
       },
       memory: {
         title: 'Recuerdo 1',
