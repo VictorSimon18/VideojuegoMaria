@@ -29,7 +29,7 @@ export const story = {
       subtitle: 'Donde todo empezó',
       signs: {
         // Carteles vacíos a propósito: se rellenarán más adelante.
-        1: '', 2: '', 3: '', 4: '', 5: '', 6: '', 7: '', 8: '', 9: '', 0: '',
+        1: '', 2: '', 3: '', 4: '', 5: '', 6: '', 7: '',
       },
       memory: {
         title: 'Recuerdo 1',
