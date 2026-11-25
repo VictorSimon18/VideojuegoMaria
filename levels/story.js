@@ -47,8 +47,13 @@ export const story = {
       name: 'Zaragoza',
       subtitle: 'Basílica del Pilar y su plaza',
       signs: {
-        // Carteles vacíos a propósito: se rellenarán más adelante.
-        1: '', 2: '', 3: '', 4: '', 5: '', 6: '', 7: '',
+        1: 'A por el nivel 2',
+        2: 'Que guapa la basílica',
+        3: 'Ten cuidado con las palomas cagona',
+        4: 'Me lo estoy pasando tajo bien haciendo esto',
+        5: 'El diseño de personajes mola no?',
+        6: 'El año que viene pasamos la ofrenda juntos',
+        7: 'A por el nivel 3',
       },
       memory: { title: 'Recuerdo 2', text: '', photo: 'assets/memories/nivel2.jpg' },
     },
