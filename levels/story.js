@@ -77,8 +77,13 @@ export const story = {
       name: 'Madrid, WiZink Centre',
       subtitle: 'El concierto de Quevedo que nos queda por vivir',
       signs: {
-        // Carteles vacíos a propósito: se rellenarán más adelante.
-        1: '', 2: '', 3: '', 4: '', 5: '', 6: '', 7: '',
+        1: 'Solo quedan 5 meses...',
+        2: 'Queeeeedate',
+        3: 'Gástate mi dinero, ma, que me hago el pendejo',
+        4: 'Los enemigos son baifos',
+        5: 'Eyayaaa, eyaya',
+        6: 'No sé qué poner aquí',
+        7: 'Ve con Quevedo y al último nivel',
       },
       memory: { title: 'Recuerdo 4', text: '', photo: 'assets/memories/nivel4.jpg' },
     },
