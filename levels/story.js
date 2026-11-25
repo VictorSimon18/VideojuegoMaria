@@ -28,16 +28,8 @@ export const story = {
       name: 'Instituto Félix de Azara',
       subtitle: 'Donde todo empezó',
       signs: {
-        1: 'Instituto Félix de Azara. Aquí empezó todo.',
-        2: 'Primeras miradas, primeras risas... y mucho patio.',
-        3: 'Quién te iba a decir que 4 años después el feo ese iba a ser tu novio.',
-        4: 'Hueco enorme. Solo María puede cruzarlo: mantén el salto en el aire para planear.',
-        5: 'Algunas cosas importantes empiezan sin avisar.',
-        6: 'Sigue por la puerta para saber qué pasa.',
-        7: 'Cajas en lo alto. Víctor puede romperlas desde abajo: sube por las nubes y salta.',
-        8: 'Con el botón de cambio (Q o E en teclado) alternas entre María y Víctor.',
-        9: '¿Oye, tú vas al Félix, no? Jajaja',
-        0: 'Me lo estoy pasando tajo bien haciendo el juego.',
+        // Carteles vacíos a propósito: se rellenarán más adelante.
+        1: '', 2: '', 3: '', 4: '', 5: '', 6: '', 7: '', 8: '', 9: '', 0: '',
       },
       memory: {
         title: 'Recuerdo 1',
@@ -60,13 +52,8 @@ export const story = {
       name: 'Parque Imperial de Plaza',
       subtitle: 'Un paseo, una cita',
       signs: {
-        1: 'Parque Imperial de Plaza. Una tarde cualquiera...',
-        2: 'Las setas rebotan: salta encima y vuela.',
-        3: 'Las hojas de otoño caen si te quedas quieto. ¡No pares!',
-        4: 'Paseando sin rumbo, hablando de todo y de nada.',
-        5: 'Hueco enorme. María planea: mantén el salto en el aire.',
-        6: 'Cajas en lo alto. Víctor las rompe desde abajo.',
-        7: 'Se hizo de noche y ni nos dimos cuenta. Fin del paseo, no de la historia.',
+        // Carteles vacíos a propósito: se rellenarán más adelante.
+        1: '', 2: '', 3: '', 4: '', 5: '', 6: '', 7: '',
       },
       memory: { title: 'Recuerdo 3', text: '', photo: 'assets/memories/nivel3.jpg' },
     },
@@ -75,13 +62,8 @@ export const story = {
       name: 'Madrid, WiZink Centre',
       subtitle: 'El concierto de Quevedo que nos queda por vivir',
       signs: {
-        1: 'Madrid, WiZink Centre. Aún no hemos ido, pero ya lo imaginamos.',
-        2: 'Los altavoces te lanzan al aire. ¡Que suene la música!',
-        3: 'Los bloques aparecen y desaparecen al ritmo. Salta al compás.',
-        4: 'Cuenta atrás para el concierto de Quevedo.',
-        5: 'Hueco enorme. María planea: mantén el salto en el aire.',
-        6: 'Cajas en lo alto. Víctor las rompe desde abajo.',
-        7: 'Este viaje lo vamos a hacer, prometido. Nos vemos en Madrid.',
+        // Carteles vacíos a propósito: se rellenarán más adelante.
+        1: '', 2: '', 3: '', 4: '', 5: '', 6: '', 7: '',
       },
       memory: { title: 'Recuerdo 4', text: '', photo: 'assets/memories/nivel4.jpg' },
     },
