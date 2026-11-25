@@ -44,11 +44,13 @@ export class GameScene {
     this.cam = new Camera();
     this.particles = new Particles();
     this.time = 0; this.state = 'play';
+    this.bunnies = []; this.bunniesFound = 0; this.bunnyMsg = 0;
     this.hearts = []; this.checkpoints = []; this.enemies = []; this.signs = []; this.goal = null;
     let start = { tx: 1, ty: this.map.H - 3 };
     for (const s of this.map.spawns) {
       if (s.ch === 'S') start = s;
       else if (s.ch === 'o') this.hearts.push({ id: this.hearts.length, x: s.tx * TILE + 8, y: s.ty * TILE + 8, got: false });
+      else if (s.ch === 'n') this.bunnies.push({ id: this.bunnies.length, x: s.tx * TILE + 8, y: (s.ty + 1) * TILE, found: false });
       else if (s.ch === 'c') this.checkpoints.push({ tx: s.tx, ty: s.ty, on: false });
       else if (s.ch === 'e') this.enemies.push(new Blob(s.tx, s.ty, this.walkerCount++));
       else if (s.ch === 'f') this.enemies.push(new Flyer(s.tx, s.ty));
@@ -100,7 +102,7 @@ export class GameScene {
     if (this.paused) return;
     this.time += dt;
     this.eggT = Math.max(0, this.eggT - dt); if (!this.eggT) this.eggTaps = 0;
-    this.eggMsg = Math.max(0, this.eggMsg - dt);
+    this.eggMsg = Math.max(0, this.eggMsg - dt); this.bunnyMsg = Math.max(0, this.bunnyMsg - dt);
     this.banner = Math.max(0, this.banner - dt);
     this.iris += (this.irisTarget - this.iris) * Math.min(1, 6 * dt) + Math.sign(this.irisTarget - this.iris) * 0.4 * dt;
     if (Math.abs(this.irisTarget - this.iris) < 0.02) this.iris = this.irisTarget;
@@ -152,6 +154,15 @@ export class GameScene {
       if (Math.abs(h.x - p.cx) < 9 && Math.abs(h.y - p.cy) < 11) {
         h.got = true; this.collected++;
         audio.sfx('heart'); this.particles.burstHearts(h.x, h.y, 5); this.particles.sparkle(h.x, h.y, 6);
+      }
+    }
+    // conejos escondidos
+    for (const b of this.bunnies) {
+      if (b.found) continue;
+      if (Math.abs(b.x - p.cx) < 10 && Math.abs((b.y - 6) - p.cy) < 13) {
+        b.found = true; this.bunniesFound++;
+        audio.sfx('checkpoint'); this.particles.sparkle(b.x, b.y - 6, 10); this.particles.burstHearts(b.x, b.y - 8, 4, '#ffe0ec');
+        if (this.bunniesFound === this.bunnies.length) { this.bunnyMsg = 3.5; audio.sfx('win'); }
       }
     }
     // checkpoints
@@ -292,6 +303,7 @@ export class GameScene {
       const f = Math.floor(t * 3) % 2, g = this.goal, gw = this.spr.goal.width / 2, gh = this.spr.goal.height;
       ctx.drawImage(this.spr.goal, f * gw, 0, gw, gh, g.tx * TILE + 8 - gw / 2 - cx, (g.ty + 1) * TILE - gh - cy, gw, gh);
     }
+    for (const b of this.bunnies) if (!b.found) ctx.drawImage(this.spr.bunny, (Math.floor(t * 2 + b.id) % 2) * 14, 0, 14, 12, Math.round(b.x - 7 - cx), Math.round(b.y - 12 - cy), 14, 12);
     for (const h of this.hearts) {
       if (h.got) continue;
       const bob = Math.sin(t * 3 + h.id) * 2;
@@ -339,6 +351,11 @@ export class GameScene {
     drawPattern(ctx, HEART_7, { X: '#ff5d8f', L: '#ffc2d6' }, x0, y0 + 1);
     drawText(ctx, `${this.collected}/${this.totalHearts}`, x0 + 11, y0, { size: 8 });
     drawText(ctx, this.player.def.name, x0, y0 + 13, { size: 8, color: '#ffd98a' });
+    if (this.bunniesFound > 0) {   // el contador de conejos solo aparece al encontrar el primero
+      const bx = x0 + 11 + `${this.collected}/${this.totalHearts}`.length * 8 + 12;
+      ctx.drawImage(this.spr.bunny, 0, 0, 14, 12, bx, y0 - 3, 14, 12);
+      drawText(ctx, `${this.bunniesFound}/${this.bunnies.length}`, bx + 17, y0, { size: 8, color: '#ffe9f0' });
+    }
     if (this.banner > 0) {
       const a = Math.min(1, this.banner, (3.4 - this.banner) * 2);
       ctx.globalAlpha = a;
@@ -347,6 +364,11 @@ export class GameScene {
       const sub = wrapText(ctx, this.def.subtitle, view.W - 40);
       drawLines(ctx, sub, view.W / 2, 60, { align: 'center', size: 8, color: '#ffe9f0' });
       ctx.globalAlpha = 1;
+    }
+    if (this.bunnyMsg > 0) {
+      const w = 200, h = 22, x = (view.W - w) / 2, y = 24;
+      drawBox(ctx, x, y, w, h, { fill: '#fff3e0', border: '#6b4434' });
+      drawText(ctx, `Encontrados los ${this.bunnies.length} conejos`, view.W / 2, y + 7, { align: 'center', color: '#5a3426', shadow: null });
     }
     if (this.eggMsg > 0) {
       const lines = wrapText(ctx, this.app.story.easterEgg, 220);

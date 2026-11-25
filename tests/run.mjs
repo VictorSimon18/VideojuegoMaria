@@ -195,9 +195,10 @@ for (let n = 2; n <= 5; n++) {
     let boxes = 0, gap = 0, best = 0;
     for (let x = 0; x < map.W; x++) { for (let y = 0; y < map.H; y++) if (map.get(x, y) === 'b') boxes++; gap = map.isSolid(x, 10) ? 0 : gap + 1; best = Math.max(best, gap); }
     return { W: map.W, hearts: sc.hearts.length, goal: !!sc.goal, signsMissing: sc.signs.filter((s) => !sc.def.signs[s.key]).map((s) => s.key),
-      signTexts: Object.keys(sc.def.signs).length, signs: sc.signs.length, boxes, gap: best, cps: sc.checkpoints.length, name: sc.def.name };
+      signTexts: Object.keys(sc.def.signs).length, signs: sc.signs.length, bunnies: sc.bunnies.length, boxes, gap: best, cps: sc.checkpoints.length, name: sc.def.name };
   });
   check(info.goal && info.hearts >= 10 && info.W > 250, `nivel ${n} (${info.name}): ${info.W} tiles, ${info.hearts} corazones, meta`);
+  if (n === 3) check(info.bunnies === 8, `nivel 3: ${info.bunnies} conejos escondidos`);
   const emptyOk = true;   // carteles vacíos a propósito (el usuario los rellenará)
   check(emptyOk ? info.signs >= 7 : (info.signsMissing.length === 0 && info.signs === info.signTexts), `nivel ${n}: ${info.signs} carteles${emptyOk ? ' (vacíos a propósito)' : ', todos con texto en story.js'}`);
   check(info.boxes >= 2 && info.gap >= 9, `nivel ${n}: tiene zona de Víctor (${info.boxes} cajas) y de María (hueco de ${info.gap})`);

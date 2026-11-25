@@ -238,6 +238,20 @@ export function makeItemSprites(theme) {
     out.goal = o;
   }
 
+  // Conejo escondido (2 fotogramas de 14x12): cabeza y orejas asomando de una mata
+  out.bunny = (() => {
+    const o = makeCanvas(28, 12), og = o.getContext('2d');
+    for (let f = 0; f < 2; f++) {
+      const c = makeCanvas(14, 12), g = c.getContext('2d'), s = f ? 1 : 0;
+      R(g, '#e8e0d8', 4, 0, 2, 5); R(g, '#e8e0d8', 8 + s, 0, 2, 5); R(g, '#ffb0c0', 5, 1, 1, 3); R(g, '#ffb0c0', 8 + s, 1, 1, 3);   // orejas
+      R(g, '#e8e0d8', 3, 4, 8, 3); R(g, '#2a1620', 4, 5, 1, 1); R(g, '#2a1620', 9, 5, 1, 1);                                          // ojos asomando
+      R(g, '#5f8a44', 0, 6, 14, 6); R(g, '#7aa85a', 1, 6, 12, 1); R(g, '#4a7a3a', 0, 9, 14, 3);                                       // mata que lo tapa
+      R(g, '#9a8a4a', 2, 7, 1, 3); R(g, '#9a8a4a', 6, 8, 1, 3); R(g, '#9a8a4a', 11, 7, 1, 3);
+      outline(c); og.drawImage(c, f * 14, 0);
+    }
+    return o;
+  })();
+
   // Bichito paseante (2 fotogramas)
   out.blob = (() => {
     const o = makeCanvas(14 * 2, 13); const og = o.getContext('2d');
