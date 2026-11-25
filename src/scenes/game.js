@@ -229,7 +229,7 @@ export class GameScene {
     this.state = 'complete'; this.endT = 0;
     audio.sfx('win'); audio.stopMusic();
     const ids = this.hearts.filter(h => h.got).map(h => h.id);
-    this.savedHearts = save.addHearts(this.levelNum, ids);
+    this.savedHearts = save.addHearts(this.levelNum, ids, this.totalHearts);
     this.allHearts = this.savedHearts.length >= this.totalHearts;
     const d = save.data; d.done[this.levelNum] = true; d.unlocked = Math.max(d.unlocked, this.levelNum + 1);
     if (this.allHearts) d.memories[this.levelNum] = true;

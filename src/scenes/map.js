@@ -23,6 +23,7 @@ export class MapScene {
   async init() {
     const d = save.data;
     this.totals = await Promise.all(Array.from({ length: LEVEL_COUNT }, (_, i) => countHearts(i + 1)));
+    save.prune(this.totals);
     this.sel = Math.max(0, Math.min(LEVEL_COUNT - 1, (this.want ?? Math.min(d.unlocked, LEVEL_COUNT)) - 1));
     this.bgs = null;
     this.bg = makeBackground(THEMES[this.app.story.levels[this.sel].theme]);
