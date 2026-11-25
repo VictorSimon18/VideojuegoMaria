@@ -31,8 +31,8 @@ export const L2 = {
   }),
   // Arcos del puente de Piedra: se puede ir por encima del tablero o por debajo de los arcos
   ARCH: () => build(G24, (a) => {
-    a.set(2, 9, '?'); a.fill(8, 7, 17, 8, 'X'); a.row(9, '.....XX.XX.o.XX..X');
-    a.set(8, 6, 'l'); a.hearts(6, [10, 14]); a.set(16, 6, 'e');
+    a.set(2, 9, '?'); a.fill(8, 7, 17, 8, 'X'); a.row(9, '.....XX.XX...XX..X');   // el corazón que estaba aquí quedaba atrapado entre ladrillos: ahora va arriba
+    a.set(8, 6, 'l'); a.hearts(6, [10, 12, 14]); a.set(16, 6, 'e');
   }),
   // Pozos de 5 tiles que el cierzo (viento a favor) ayuda a saltar
   SKIPS: () => build('######.....######.....##', (a) => {

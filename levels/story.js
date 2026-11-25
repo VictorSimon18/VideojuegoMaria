@@ -41,7 +41,7 @@ export const story = {
       },
       memory: {
         title: 'Recuerdo 1',
-        text: 'Donde nos conocimos. (Escribe aquí vuestro recuerdo.)',
+        text: '',
         photo: 'assets/memories/nivel1.jpg',
       },
     },
@@ -53,7 +53,7 @@ export const story = {
         // Carteles vacíos a propósito: se rellenarán más adelante.
         1: '', 2: '', 3: '', 4: '', 5: '', 6: '', 7: '',
       },
-      memory: { title: 'Recuerdo 2', text: 'Paseos por Zaragoza. (Escribe aquí vuestro recuerdo.)', photo: 'assets/memories/nivel2.jpg' },
+      memory: { title: 'Recuerdo 2', text: '', photo: 'assets/memories/nivel2.jpg' },
     },
     {
       id: 3, theme: 'parque',
@@ -68,7 +68,7 @@ export const story = {
         6: 'Cajas en lo alto. Víctor las rompe desde abajo.',
         7: 'Se hizo de noche y ni nos dimos cuenta. Fin del paseo, no de la historia.',
       },
-      memory: { title: 'Recuerdo 3', text: 'Una tarde en el parque. (Escribe aquí vuestro recuerdo.)', photo: 'assets/memories/nivel3.jpg' },
+      memory: { title: 'Recuerdo 3', text: '', photo: 'assets/memories/nivel3.jpg' },
     },
     {
       id: 4, theme: 'wizink',
@@ -83,7 +83,7 @@ export const story = {
         6: 'Cajas en lo alto. Víctor las rompe desde abajo.',
         7: 'Este viaje lo vamos a hacer, prometido. Nos vemos en Madrid.',
       },
-      memory: { title: 'Recuerdo 4', text: 'Una ilusión compartida. (Escribe aquí vuestro recuerdo.)', photo: 'assets/memories/nivel4.jpg' },
+      memory: { title: 'Recuerdo 4', text: '', photo: 'assets/memories/nivel4.jpg' },
     },
     {
       id: 5, theme: 'calle',

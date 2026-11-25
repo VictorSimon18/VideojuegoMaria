@@ -43,10 +43,12 @@ export class MemoryScene {
     drawText(ctx, '¡Recuerdo desbloqueado!', W / 2, 8, { align: 'center', size: 10, color: '#ffd98a' });
 
     // polaroid
-    const pw = 116, ph = 128, px = Math.round(W * 0.27 - pw / 2), py = 28 + Math.round(Math.sin(t * 2) * 1);
+    const textual = !!this.def.memory.text;   // sin texto: solo la foto, más grande y centrada
+    const pw = textual ? 116 : 156, ph = textual ? 128 : 134, px = textual ? Math.round(W * 0.27 - pw / 2) : Math.round((W - pw) / 2);
+    const py = (textual ? 28 : 24) + Math.round(Math.sin(t * 2) * 1);
     ctx.fillStyle = 'rgba(0,0,0,0.35)'; ctx.fillRect(px + 3, py + 4, pw, ph);
     ctx.fillStyle = '#fff6ea'; ctx.fillRect(px, py, pw, ph);
-    const ax = px + 8, ay = py + 8, aw = pw - 16, ah = 92;
+    const ax = px + 8, ay = py + 8, aw = pw - 16, ah = textual ? 92 : ph - 32;
     if (this.photo) {
       const r = Math.max(aw / this.photo.width, ah / this.photo.height), sw = aw / r, sh = ah / r;
       ctx.imageSmoothingEnabled = true;
@@ -59,6 +61,7 @@ export class MemoryScene {
       drawText(ctx, 'Tu foto aquí', ax + aw / 2, ay + 52, { align: 'center', size: 8, color: '#fff6ea', shadow: '#a02255' });
       drawText(ctx, `nivel${this.n}.jpg`, ax + aw / 2, ay + 66, { align: 'center', size: 8, color: '#fff6ea', shadow: '#a02255' });
     }
+    if (!textual) { if (this.t > 0.8 && Math.floor(t * 2) % 2 === 0) drawText(ctx, 'Toca para continuar', W / 2, 166, { align: 'center', size: 8 }); return; }
     drawText(ctx, this.def.memory.title, px + pw / 2, py + ph - 20, { align: 'center', size: 8, color: '#6b4434', shadow: null });
 
     // texto del recuerdo
