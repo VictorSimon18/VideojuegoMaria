@@ -1,7 +1,7 @@
 // Service worker: permite jugar sin conexión y que la app se instale a pantalla completa.
 // Estrategia: se precachea todo el juego; después, "stale-while-revalidate" (se sirve lo guardado y se
 // actualiza en segundo plano). Si cambias archivos, SUBE el número de CACHE_VERSION para limpiar la caché.
-const CACHE_VERSION = 8;
+const CACHE_VERSION = 9;
 const CACHE = `videojuego-maria-v${CACHE_VERSION}`;
 
 const FILES = [
